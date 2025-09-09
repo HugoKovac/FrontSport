@@ -1,0 +1,13 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "GoNext Dev",
+      "Group": "Servers",
+      "Host": "postgres_dev",
+      "Port": 5432,
+      "MaintenanceDB": "gonext_dev",
+      "Username": "postgres",
+      "SSLMode": "prefer"
+    }
+  }
+}
