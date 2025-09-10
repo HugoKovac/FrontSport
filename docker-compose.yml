@@ -32,7 +32,6 @@ services:
 
 volumes:
   postgres_data_dev:
-  pgadmin_data_dev:
 
 
 networks:

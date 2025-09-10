@@ -19,6 +19,7 @@ func (Workout) Fields() []ent.Field {
     return []ent.Field{
         field.String("Name"),
         field.UUID("user_id", uuid.UUID{}),
+		// associate thread id
     }
 }
 
