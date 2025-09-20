@@ -19,7 +19,7 @@ func NewEntClient(config *config.Config) *ent.Client {
         sslmode = "disable"
     }
     dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s", // disable ssl for dev
-        config.Db.Host, config.Db.Port, config.Db.User, config.Db.Password, config.Db.DbName, sslmode)
+        config.Db.Psql.Host, config.Db.Psql.Port, config.Db.Psql.User, config.Db.Psql.Password, config.Db.Psql.DbName, sslmode)
     
     client, err := ent.Open(dialect.Postgres, dsn)
     if err != nil {

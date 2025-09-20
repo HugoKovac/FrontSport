@@ -6,10 +6,12 @@ import (
 	"os/signal"
 	"syscall"
 
+	"GoNext/base/ent"
 	"GoNext/base/internal/adapters/handlers"
 	"GoNext/base/internal/adapters/repositories"
-	"GoNext/base/pkg/database"
 	"GoNext/base/pkg/config"
+	"GoNext/base/pkg/database"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	_ "github.com/lib/pq"
@@ -18,12 +20,18 @@ import (
 func main() {
 	config := config.LoadConfig()
 
-	entClient := database.NewEntClient(config)
+	var entClient *ent.Client
+	log.Println(config.Db.Type)
+	switch config.Db.Type {
+	case "sqlite":
+		entClient = database.NewSQLiteEntClient(config)
+	default:
+		entClient = database.NewEntClient(config)
+	}
 	defer entClient.Close()
 
 	userRepo := repositories.NewUserRepository(entClient)
 
-	
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Cors.AllowOrigins,
@@ -31,7 +39,7 @@ func main() {
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
 		AllowCredentials: true,
 	}))
-	
+
 	router := handlers.NewRouter(app, userRepo, config)
 	router.SetupPublicRoutes()
 	router.SetupProtectedRoutes()

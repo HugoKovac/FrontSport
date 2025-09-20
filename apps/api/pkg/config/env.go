@@ -14,12 +14,22 @@ type CorsConfig struct {
 	AllowOrigins string
 }
 
-type DbConfig struct {
+type PsqlConfig struct {
 	Host     string
 	Port     string
 	User     string
 	Password string
 	DbName   string
+}
+
+type SqliteConfig struct {
+	Path string
+}
+
+type DbConfig struct {
+	Type     string
+	Sqlite SqliteConfig
+	Psql   PsqlConfig
 }
 
 type JwtConfig struct {
@@ -34,11 +44,21 @@ type Config struct {
 }
 
 func LoadConfig() *Config {
-	dbHost := os.Getenv("DB_HOST")
-	dbPort := os.Getenv("DB_PORT")
-	dbUser := os.Getenv("DB_USER")
-	dbPassword := os.Getenv("DB_PASSWORD")
-	dbName := os.Getenv("DB_NAME")
+	var (
+		sqlitePath   string
+		psqlHost     string
+		psqlPort     string
+		psqlUser     string
+		psqlPassword string
+		psqlName     string
+	)
+	dbType := os.Getenv("DB_TYPE")
+	sqlitePath = os.Getenv("SQLITE_PATH")
+	psqlHost = os.Getenv("PSQL_HOST")
+	psqlPort = os.Getenv("PSQL_PORT")
+	psqlUser = os.Getenv("PSQL_USER")
+	psqlPassword = os.Getenv("PSQL_PASSWORD")
+	psqlName = os.Getenv("PSQL_NAME")
 	mode := os.Getenv("MODE")
 	frontendDomain := os.Getenv("FRONTEND_DOMAIN")
 	domain := os.Getenv("DOMAIN")
@@ -54,11 +74,17 @@ func LoadConfig() *Config {
 
 	return &Config{
 		Db: DbConfig{
-			Host:     dbHost,
-			Port:     dbPort,
-			User:     dbUser,
-			Password: dbPassword,
-			DbName:   dbName,
+			Sqlite: SqliteConfig{
+				Path: sqlitePath,
+			},
+			Psql: PsqlConfig{
+				Host:     psqlHost,
+				Port:     psqlPort,
+				User:     psqlUser,
+				Password: psqlPassword,
+				DbName:   psqlName,
+			},
+			Type: dbType,
 		},
 		Jwt: JwtConfig{
 			Secret: jwtSecret,
