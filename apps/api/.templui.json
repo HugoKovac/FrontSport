@@ -1,0 +1,7 @@
+{
+  "componentsDir": "templ/components",
+  "utilsDir": "templ/utils",
+  "moduleName": "GoNext/base",
+  "jsDir": "templ/assets/js",
+  "jsPublicPath": "/templ/assets/js"
+}

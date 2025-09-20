@@ -1,0 +1,35 @@
+package auth
+
+import (
+	"GoNext/base/templ/components/input"
+	"GoNext/base/templ/components/form"
+	"GoNext/base/templ/layouts"
+)
+
+templ Register(){
+@layouts.BaseLayout(){
+<div class="w-full max-w-sm">
+    @form.Item() {
+    @form.Label(form.LabelProps{
+    For: "email-form",
+    }) {
+    Email
+    }
+    @input.Input(input.Props{
+    ID: "email-form",
+    Type: input.TypeEmail,
+    Placeholder: "m@example.com",
+    HasError: true,
+    })
+    @form.Description() {
+    Enter your email address for notifications.
+    }
+    @form.Message(form.MessageProps{
+    Variant: form.MessageVariantError,
+    }) {
+    Please enter a valid email address
+    }
+    }
+</div>
+}
+}

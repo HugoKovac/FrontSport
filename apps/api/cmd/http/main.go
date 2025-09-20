@@ -21,7 +21,6 @@ func main() {
 	config := config.LoadConfig()
 
 	var entClient *ent.Client
-	log.Println(config.Db.Type)
 	switch config.Db.Type {
 	case "sqlite":
 		entClient = database.NewSQLiteEntClient(config)
