@@ -20,7 +20,7 @@ func NewSQLiteEntClient(config *config.Config) *ent.Client {
 
 	dsn := fmt.Sprintf("file:%s?cache=shared&_fk=1", config.Db.Sqlite.Path)
 
-	client, err := ent.Open(dialect.Postgres, dsn)
+	client, err := ent.Open(dialect.SQLite, dsn)
 	if err != nil {
 		log.Fatalf("failed opening connection to postgres: %v", err)
 	}
@@ -60,6 +60,10 @@ func NewSQLiteEntClient(config *config.Config) *ent.Client {
 			})
 		}),
 	)
+
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	return client
 }

@@ -6,7 +6,10 @@ import (
 	"GoNext/base/internal/core/domain"
 	"GoNext/base/internal/core/ports"
 	"GoNext/base/pkg/config"
+	"GoNext/base/pkg/templ"
 	customvalidator "GoNext/base/pkg/validator"
+	"GoNext/base/templ/components"
+	"GoNext/base/templ/views/auth"
 	"log"
 	"os"
 	"time"
@@ -35,34 +38,60 @@ func NewAuthHandler(authService ports.AuthService, userService ports.UserService
 	}
 }
 
+func (h *AuthHandler) RegisterPage(c *fiber.Ctx) error {
+	return templ.Render(c, auth.Register())
+}
+
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var user domain.User
-	if err := c.BodyParser(&user); err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusBadRequest).SendString("Bad Request")
+	var userDTO dto.UserCredentials
+	if err := c.BodyParser(&userDTO); err != nil {
+		c.Status(fiber.StatusUnprocessableEntity)
+		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))
 	}
 
-	// Validate credentials
-	if err := h.validate.Struct(dto.UserCredentials{
-		Email:    user.Email,
-		Password: user.Password,
-	}); err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusBadRequest).SendString("Bad Request")
+	log.Println(userDTO)
+
+	if err := h.validate.Struct(userDTO); err != nil {
+		if errs, ok := err.(validator.ValidationErrors); ok {
+			c.Status(fiber.StatusUnprocessableEntity)
+			return templ.Render(c, components.ErrorMessage(customvalidator.ErrorMessage(errs)))
+		}
 	}
 
-	createdUser, err := h.userService.Register(user)
+	if userDTO.Password != userDTO.Confirm {
+		c.Status(fiber.StatusUnprocessableEntity)
+		templ.Render(c, components.Input(components.InputAttributes{
+                                Id: "password",
+                                Name: "password",
+                                Type: "password",
+								Placeholder: "Password",
+								Error: true,
+								OOB: true,
+                            }))
+		templ.Render(c, components.Input(components.InputAttributes{
+                                Id: "confirm",
+                                Name: "confirm",
+                                Type: "password",
+								Placeholder: "Confirm Password",
+								Error: true,
+								OOB: true,
+                            }))
+		return templ.Render(c, components.ErrorMessage([]string{"Password: password confirmation doesn't match"}))
+	}
+
+	_, err := h.userService.Register(domain.User{
+		Email:    userDTO.Email,
+		Password: userDTO.Password,
+	})
 	if err != nil {
-		return c.Status(fiber.StatusConflict).JSON(fiber.Map{
-			"error": err.Error(),
-		})
+		c.Status(fiber.StatusUnprocessableEntity)
+		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))
 	}
 
-	token, err := h.authService.Authenticate(user.Email, user.Password)
+	token, err := h.authService.Authenticate(userDTO.Email, userDTO.Password)
 	if err != nil {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-			"error": "Invalid credentials",
-		})
+		c.Status(fiber.StatusUnprocessableEntity)
+		return templ.Render(c, components.ErrorMessage([]string{"Invalid credentials"}))
 	}
 
 	var domain string
@@ -77,13 +106,14 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		Domain:   domain,
 		Secure:   true,
 		HTTPOnly: true,
-		SameSite: "None", // <-- Change this
+		SameSite: "Lax",
 		Expires:  time.Now().Add(time.Hour * 24),
 		Path:     "/",
 	}
 	c.Cookie(&cookie)
+	c.Set("HX-Redirect", "/api/protected-home")
 
-	return c.Status(fiber.StatusCreated).JSON(createdUser.ToFront())
+	return c.Status(fiber.StatusCreated).Send([]byte{})
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
@@ -116,14 +146,13 @@ func (h *AuthHandler) Login(c *fiber.Ctx) error {
 		Domain:   domain,
 		Secure:   true,
 		HTTPOnly: true,
-		SameSite: "None", // <-- Change this
+		SameSite: "Lax",
 		Expires:  time.Now().Add(time.Hour * 24),
 		Path:     "/",
 	}
 	c.Cookie(&cookie)
-	return c.Status(fiber.StatusOK).JSON(fiber.Map{
-		"message": "Login successful",
-	})
+	c.Set("HX-Redirect", "/")
+	return c.Status(fiber.StatusOK).Send([]byte{})
 }
 
 func (h *AuthHandler) Status(c *fiber.Ctx) error {

@@ -8,8 +8,6 @@ package layouts
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "GoNext/base/templ/components/input"
-
 func BaseLayout() templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -31,15 +29,7 @@ func BaseLayout() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full dark\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><!-- Tailwind CSS (output) --><link href=\"/templ/assets/css/output.css\" rel=\"stylesheet\">")
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = input.Script().Render(ctx, templ_7745c5c3_Buffer)
-		if templ_7745c5c3_Err != nil {
-			return templ_7745c5c3_Err
-		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</head><body class=\"h-full\"><div class=\"h-full flex flex-col\"><main class=\"flex-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<!doctype html><html lang=\"en\" class=\"h-full\" data-theme=\"dim\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><script src=\"/assets/js/htmx.min.js\"></script><!-- Tailwind CSS (output) --><link href=\"https://cdn.jsdelivr.net/npm/daisyui@5\" rel=\"stylesheet\" type=\"text/css\"><link href=\"https://cdn.jsdelivr.net/npm/daisyui@5/themes.css\" rel=\"stylesheet\" type=\"text/css\"><script src=\"https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4\"></script><link href=\"/assets/css/output.css\" rel=\"stylesheet\"></head><body id=\"root\" class=\"h-full\"><script>\n        document.body.addEventListener('htmx:beforeSwap', function (evt) {\n            if (evt.detail.xhr.status === 404) {\n                // alert the user when a 404 occurs (maybe use a nicer mechanism than alert())\n                window.location.replace(\"/error/not-found\")\n            } else if (evt.detail.xhr.status === 422) {\n                // allow 422 responses to swap as we are using this as a signal that\n                // a form was submitted with bad data and want to rerender with the\n                // errors\n                //\n                // set isError to false to avoid error logging in console\n                evt.detail.shouldSwap = true;\n                evt.detail.isError = false;\n            } else if (evt.detail.xhr.status === 418) {\n                // if the response code 418 (I'm a teapot) is returned, retarget the\n                // content of the response to the element with the id `teapot`\n                evt.detail.shouldSwap = true;\n                evt.detail.target = htmx.find(\"#teapot\");\n            }\n        });\n    </script><main class=\"h-full flex\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -47,7 +37,7 @@ func BaseLayout() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</main></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</main></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

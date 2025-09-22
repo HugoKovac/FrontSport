@@ -1,0 +1,9 @@
+package components
+
+templ Button(content string, t string, primary bool){
+    if primary {
+        <button type={t} class="btn btn-primary">{content}</button>
+    } else {
+        <button type={t} class="btn btn-outline btn-secondary">{content}</button>
+    }
+}

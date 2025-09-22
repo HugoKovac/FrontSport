@@ -1,0 +1,9 @@
+package components
+
+templ Anchor(href string, content string, primary bool){
+    if primary {
+        <a href={href} class="btn btn-primary">{content}</a>
+    } else {
+        <a href={href} class="btn btn-outline btn-secondary">{content}</a>
+    }
+}

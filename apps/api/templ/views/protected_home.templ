@@ -1,0 +1,9 @@
+package views
+
+import "GoNext/base/templ/layouts"
+
+templ ProtectedHome(name string) {
+    @layouts.BaseLayout(){
+        <h1>Hello, {name}</h1>
+    }
+}

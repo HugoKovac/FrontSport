@@ -21,10 +21,10 @@ func main() {
 	config := config.LoadConfig()
 
 	var entClient *ent.Client
-	switch config.Db.Type {
-	case "sqlite":
+	if config.Db.Type == "sqlite" {
+		log.Println("using sqlite")
 		entClient = database.NewSQLiteEntClient(config)
-	default:
+	} else {
 		entClient = database.NewEntClient(config)
 	}
 	defer entClient.Close()

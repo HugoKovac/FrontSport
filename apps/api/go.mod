@@ -7,7 +7,6 @@ toolchain go1.24.3
 require (
 	ariga.io/atlas v0.31.1-0.20250212144724-069be8033e83
 	entgo.io/ent v0.14.4
-	github.com/Oudwins/tailwind-merge-go v0.2.1
 	github.com/a-h/templ v0.3.943
 	github.com/go-playground/validator/v10 v10.26.0
 	github.com/gofiber/fiber/v2 v2.52.6

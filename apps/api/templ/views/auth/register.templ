@@ -1,35 +1,52 @@
 package auth
 
 import (
-	"GoNext/base/templ/components/input"
-	"GoNext/base/templ/components/form"
 	"GoNext/base/templ/layouts"
+	"GoNext/base/templ/components"
 )
 
 templ Register(){
-@layouts.BaseLayout(){
-<div class="w-full max-w-sm">
-    @form.Item() {
-    @form.Label(form.LabelProps{
-    For: "email-form",
-    }) {
-    Email
-    }
-    @input.Input(input.Props{
-    ID: "email-form",
-    Type: input.TypeEmail,
-    Placeholder: "m@example.com",
-    HasError: true,
-    })
-    @form.Description() {
-    Enter your email address for notifications.
-    }
-    @form.Message(form.MessageProps{
-    Variant: form.MessageVariantError,
-    }) {
-    Please enter a valid email address
-    }
-    }
-</div>
+	@layouts.BaseLayout(){
+        <div class="h-full flex flex-col justify-center mx-auto">
+            @components.Card(){
+                    <h2 class="text-3xl font-bold">Register</h2>
+                    <form id="register-form" class="flex flex-col mt-6 px-2.5" hx-post="/api/auth/register" hx-target="#errorMsg">
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "email",
+                                Name: "email",
+                                Type: "text",
+                                Placeholder: "Email",
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "password",
+                                Name: "password",
+                                Type: "password",
+                                Placeholder: "Password",
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "confirm",
+                                Name: "confirm",
+                                Type: "password",
+                                Placeholder: "Confirm Password",
+                            })
+                        </div>
+
+                        <div class="flex flex-col justify-between my-3.5 mt-6">
+                            @components.Button("register", "submit", true)
+                            <div class="my-1"></div>
+                            @components.Anchor("/auth/login", "login", false)
+                        </div>
+                        @components.ErrorMessage([]string{})
+                    </form>
+            }
+        </div>
+	}
 }
-}
+

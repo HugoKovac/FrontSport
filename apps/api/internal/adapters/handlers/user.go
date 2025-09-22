@@ -2,7 +2,9 @@ package handlers
 
 import (
 	"GoNext/base/internal/core/ports"
+	"GoNext/base/pkg/templ"
 	customvalidator "GoNext/base/pkg/validator"
+	"GoNext/base/templ/views"
 
 	"github.com/go-playground/validator/v10"
 
@@ -100,4 +102,16 @@ func (h *UserHandler) UpdateCurrentUser(c *fiber.Ctx) error {
 	}
 	user.Password = "" // Don't return the password
 	return c.JSON(user)
+}
+
+func (h *UserHandler) ProtectedHomePage(c *fiber.Ctx) error {
+	userID := c.Locals("userID").(string)
+
+	user, err := h.userService.GetById(userID)
+	if err != nil {
+		c.Set("HX-Redirect", "/auth/register")
+		return c.Status(fiber.StatusNotFound).Send([]byte{})
+	}
+
+	return templ.Render(c, views.ProtectedHome(user.Email))
 }
