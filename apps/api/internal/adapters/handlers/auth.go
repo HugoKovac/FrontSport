@@ -10,7 +10,6 @@ import (
 	customvalidator "GoNext/base/pkg/validator"
 	"GoNext/base/templ/components"
 	"GoNext/base/templ/views/auth"
-	"log"
 	"os"
 	"time"
 
@@ -43,13 +42,11 @@ func (h *AuthHandler) RegisterPage(c *fiber.Ctx) error {
 }
 
 func (h *AuthHandler) Register(c *fiber.Ctx) error {
-	var userDTO dto.UserCredentials
+	var userDTO dto.RegisterCredentials
 	if err := c.BodyParser(&userDTO); err != nil {
 		c.Status(fiber.StatusUnprocessableEntity)
 		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))
 	}
-
-	log.Println(userDTO)
 
 	if err := h.validate.Struct(userDTO); err != nil {
 		if errs, ok := err.(validator.ValidationErrors); ok {
@@ -61,21 +58,21 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	if userDTO.Password != userDTO.Confirm {
 		c.Status(fiber.StatusUnprocessableEntity)
 		templ.Render(c, components.Input(components.InputAttributes{
-                                Id: "password",
-                                Name: "password",
-                                Type: "password",
-								Placeholder: "Password",
-								Error: true,
-								OOB: true,
-                            }))
+			Id:          "password",
+			Name:        "password",
+			Type:        "password",
+			Placeholder: "Password",
+			Error:       true,
+			OOB:         true,
+		}))
 		templ.Render(c, components.Input(components.InputAttributes{
-                                Id: "confirm",
-                                Name: "confirm",
-                                Type: "password",
-								Placeholder: "Confirm Password",
-								Error: true,
-								OOB: true,
-                            }))
+			Id:          "confirm",
+			Name:        "confirm",
+			Type:        "password",
+			Placeholder: "Confirm Password",
+			Error:       true,
+			OOB:         true,
+		}))
 		return templ.Render(c, components.ErrorMessage([]string{"Password: password confirmation doesn't match"}))
 	}
 
@@ -111,27 +108,41 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 		Path:     "/",
 	}
 	c.Cookie(&cookie)
-	c.Set("HX-Redirect", "/api/protected-home")
+	c.Set("HX-Redirect", "/")
 
 	return c.Status(fiber.StatusCreated).Send([]byte{})
+}
+
+func (h *AuthHandler) LoginPage(c *fiber.Ctx) error {
+	return templ.Render(c, auth.Login())
 }
 
 func (h *AuthHandler) Login(c *fiber.Ctx) error {
 	var creds dto.UserCredentials
 	if err := c.BodyParser(&creds); err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusBadRequest).SendString("Bad Request")
+		c.Status(fiber.StatusUnprocessableEntity)
+		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))
 	}
 
 	if err := h.validate.Struct(creds); err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusBadRequest).SendString("Bad Request")
+		if errs, ok := err.(validator.ValidationErrors); ok {
+			c.Status(fiber.StatusUnprocessableEntity)
+			return templ.Render(c, components.ErrorMessage(customvalidator.ErrorMessage(errs)))
+		}
 	}
 
 	token, err := h.authService.Authenticate(creds.Email, creds.Password)
 	if err != nil {
-		log.Println(err.Error())
-		return c.Status(fiber.StatusUnauthorized).SendString("Unauthorized")
+		c.Status(fiber.StatusUnprocessableEntity)
+		templ.Render(c, components.Input(components.InputAttributes{
+			Id:          "password",
+			Name:        "password",
+			Type:        "password",
+			Placeholder: "Password",
+			Error:       true,
+			OOB:         true,
+		}))
+		return templ.Render(c, components.ErrorMessage([]string{"Wrong credentials"}))
 	}
 
 	var domain string
@@ -193,7 +204,6 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		Path:     "/",
 	}
 	c.Cookie(&cookie)
-	return c.JSON(fiber.Map{
-		"message": "Logged out successfully",
-	})
+	c.Set("HX-Refresh", "true")
+	return nil
 }

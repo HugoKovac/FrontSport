@@ -1,9 +1,13 @@
 package views
 
-import "GoNext/base/templ/layouts"
+import (
+    "GoNext/base/templ/layouts"
+    "GoNext/base/templ/components"
+)
 
 templ ProtectedHome(name string) {
     @layouts.BaseLayout(){
+        @components.NavBar(components.NavBarAttributes{Auth: true})
         <h1>Hello, {name}</h1>
     }
 }

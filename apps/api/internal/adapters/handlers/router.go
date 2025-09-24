@@ -34,7 +34,7 @@ func (r *Router) SetupPublicRoutes() {
 
 	// rendered views
 	r.app.Get("/auth/register", r.authHandler.RegisterPage)
-	// r.app.Get("/auth/login", r.authHandler.LoginPage)
+	r.app.Get("/auth/login", r.authHandler.LoginPage)
 	// r.app.Get("*", r.errorHandler.NotFoundPage)
 	r.app.Get("/auth/register", r.authHandler.RegisterPage)
 
@@ -47,11 +47,12 @@ func (r *Router) SetupPublicRoutes() {
 }
 
 func (r *Router) SetupProtectedRoutes() {
-	api := r.app.Group("/api", middleware.JWTAuthentication(r.authHandler.authService))
+	api := r.app.Group("/api", middleware.JWTAuthentication(r.authHandler.authService, true))
 	api.Get("/users/me", r.userHandler.GetCurrentUser)
 	api.Put("/users/me", r.userHandler.UpdateCurrentUser)
 	api.Get("/users", r.userHandler.GetByEmail)
-
+	
 	// rendered views
-	api.Get("/protected-home", r.userHandler.ProtectedHomePage)
+	views := r.app.Group("/", middleware.JWTAuthentication(r.authHandler.authService, false))
+	views.Get("/", r.userHandler.HomePage)
 }

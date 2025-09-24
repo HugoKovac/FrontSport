@@ -104,12 +104,17 @@ func (h *UserHandler) UpdateCurrentUser(c *fiber.Ctx) error {
 	return c.JSON(user)
 }
 
-func (h *UserHandler) ProtectedHomePage(c *fiber.Ctx) error {
+func (h *UserHandler) HomePage(c *fiber.Ctx) error {
 	userID := c.Locals("userID").(string)
+
+	if userID == "" {
+		return templ.Render(c, views.PublicHome())
+	}
 
 	user, err := h.userService.GetById(userID)
 	if err != nil {
 		c.Set("HX-Redirect", "/auth/register")
+
 		return c.Status(fiber.StatusNotFound).Send([]byte{})
 	}
 

@@ -6,3 +6,5 @@ air_tmp
 .env.test
 .env.test.local
 certs
+ent.db
+

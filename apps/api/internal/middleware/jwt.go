@@ -9,13 +9,18 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func JWTAuthentication(authService ports.AuthService) fiber.Handler {
+func JWTAuthentication(authService ports.AuthService, sendError bool) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Cookies("token")
 		if token == "" {
-			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-				"error": "Missing authorization header",
-			})
+			if sendError {
+				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+					"error": "Missing authorization header",
+				})
+			} else {
+				c.Locals("userID", "")
+				return c.Next()
+			}
 		}
 
 		parts := strings.Split(token, " ")
