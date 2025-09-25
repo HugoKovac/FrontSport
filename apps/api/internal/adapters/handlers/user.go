@@ -6,6 +6,7 @@ import (
 	customvalidator "GoNext/base/pkg/validator"
 	"GoNext/base/templ/views"
 
+	"GoNext/base/templ/components"
 	"github.com/go-playground/validator/v10"
 
 	"github.com/gofiber/fiber/v2"
@@ -86,7 +87,12 @@ func (h *UserHandler) UpdateCurrentUser(c *fiber.Ctx) error {
 		NewPassword string `json:"newPassword" validate:"password"`
 	}
 
-	h.validate.Struct(&userUpdate)
+	if err := h.validate.Struct(userUpdate); err != nil {
+		if errs, ok := err.(validator.ValidationErrors); ok {
+			c.Status(fiber.StatusUnprocessableEntity)
+			return templ.Render(c, components.ErrorMessage(customvalidator.ErrorMessage(errs)))
+		}
+	}
 
 	if err := c.BodyParser(&userUpdate); err != nil {
 		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{
@@ -100,18 +106,30 @@ func (h *UserHandler) UpdateCurrentUser(c *fiber.Ctx) error {
 			"error": "Failed to update user",
 		})
 	}
-	user.Password = "" // Don't return the password
-	return c.JSON(user)
+
+	if userUpdate.Email != "" {
+		templ.Render(c, components.Input(components.InputAttributes{
+			Id:          "email",
+			Name:        "email",
+			Type:        "text",
+			Placeholder: "Email",
+			Value:       user.Email,
+			Error:       false,
+			OOB:         true,
+		}))
+	}
+
+	return nil
 }
 
 func (h *UserHandler) HomePage(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
+	userID := c.Locals("userID")
 
-	if userID == "" {
+	if userID == nil {
 		return templ.Render(c, views.PublicHome())
 	}
 
-	user, err := h.userService.GetById(userID)
+	user, err := h.userService.GetById(userID.(string))
 	if err != nil {
 		c.Set("HX-Redirect", "/auth/register")
 
@@ -119,4 +137,21 @@ func (h *UserHandler) HomePage(c *fiber.Ctx) error {
 	}
 
 	return templ.Render(c, views.ProtectedHome(user.Email))
+}
+
+func (h *UserHandler) ProfilePage(c *fiber.Ctx) error {
+	userID := c.Locals("userID")
+
+	if userID == nil {
+		return templ.Render(c, views.PublicHome())
+	}
+
+	user, err := h.userService.GetById(userID.(string))
+	if err != nil {
+		c.Set("HX-Redirect", "/auth/register")
+
+		return c.Status(fiber.StatusNotFound).Send([]byte{})
+	}
+
+	return templ.Render(c, views.Profile(user.Email))
 }

@@ -3,22 +3,18 @@ package components
 type InputAttributes struct {
     Id string
     Name string
+    Value string
     Placeholder string
     Type string
     Error bool
+    Optional bool
     OOB bool
 }
 
 templ Input(attr InputAttributes){
-    // if attr.Error {
-    //     <input id={attr.Id} name={attr.Name} type={attr.Type} class="input input-error" hx-swap-oob={attr.OOB}>
-    // } else {
-    //     <input id={attr.Id} name={attr.Name} type={attr.Type} class="input input-primary">
-    // }
     <div id={attr.Id}
-        if attr.Error {
             hx-swap-oob={attr.OOB}
-        }>
+        >
         <label 
             if attr.Error {
                 class="input input-error validator w-full"
@@ -55,9 +51,12 @@ templ Input(attr InputAttributes){
         </svg>
         <input
             type={attr.Type}
-            required
+            if !attr.Optional {
+                required
+            }
             placeholder={attr.Placeholder}
             name={attr.Name}
+            value={attr.Value}
             title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
         />
         </label>

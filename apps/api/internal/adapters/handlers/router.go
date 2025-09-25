@@ -47,12 +47,14 @@ func (r *Router) SetupPublicRoutes() {
 }
 
 func (r *Router) SetupProtectedRoutes() {
-	api := r.app.Group("/api", middleware.JWTAuthentication(r.authHandler.authService, true))
+	api := r.app.Group("/api", middleware.JWTAuthentication(r.authHandler.authService))
 	api.Get("/users/me", r.userHandler.GetCurrentUser)
 	api.Put("/users/me", r.userHandler.UpdateCurrentUser)
 	api.Get("/users", r.userHandler.GetByEmail)
 	
 	// rendered views
-	views := r.app.Group("/", middleware.JWTAuthentication(r.authHandler.authService, false))
+	views := r.app.Group("/", middleware.JWTAuthentication(r.authHandler.authService))
 	views.Get("/", r.userHandler.HomePage)
+	views.Get("/profile", r.userHandler.ProfilePage)
+
 }

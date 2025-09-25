@@ -2,6 +2,7 @@
 package middleware
 
 import (
+	"log"
 	"strings"
 
 	"GoNext/base/internal/core/ports"
@@ -9,14 +10,14 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func JWTAuthentication(authService ports.AuthService, sendError bool) fiber.Handler {
+func JWTAuthentication(authService ports.AuthService) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		token := c.Cookies("token")
 		if token == "" {
-			if sendError {
-				return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
-					"error": "Missing authorization header",
-				})
+			log.Println(c.Method())
+			if c.Method() == "GET" {
+				c.Set("HX-Redirect", "/auth/register")
+				return c.Next()
 			} else {
 				c.Locals("userID", "")
 				return c.Next()
