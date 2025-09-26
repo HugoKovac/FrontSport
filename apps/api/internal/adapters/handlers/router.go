@@ -1,60 +1,47 @@
 package handlers
 
 import (
+	"GoNext/base/internal/adapters/handlers/auth"
+	error_handler "GoNext/base/internal/adapters/handlers/error"
+	"GoNext/base/internal/adapters/handlers/public"
+	"GoNext/base/internal/adapters/handlers/user"
 	"GoNext/base/internal/core/ports"
 	"GoNext/base/internal/core/services"
 	"GoNext/base/internal/middleware"
 	"GoNext/base/pkg/config"
+	customvalidator "GoNext/base/pkg/validator"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/gofiber/fiber/v2"
 )
 
-type Router struct {
-	app          *fiber.App
-	authHandler  *AuthHandler
-	userHandler  *UserHandler
-	errorHandler *ErrorHandler
-}
-
-func NewRouter(app *fiber.App, userRepo ports.UserRepository, config *config.Config) *Router {
+func InitHandlers(app *fiber.App, userRepo ports.UserRepository, config *config.Config) {
 
 	authService := services.NewAuthService(userRepo, config.Jwt.Secret)
 	userService := services.NewUserService(userRepo)
 
-	authHandler := NewAuthHandler(authService, userService, config)
-	userHandler := NewUserHandler(userService)
-	errorHandler := NewErrorHandler()
+	v := validator.New()
+	customvalidator.RegisterCustomValidators(v)
 
-	return &Router{app: app, authHandler: authHandler, userHandler: userHandler, errorHandler: errorHandler}
-}
+	app.Static("/assets", "./templ/assets")
 
-func (r *Router) SetupPublicRoutes() {
-	// static
-	r.app.Static("/assets", "./templ/assets")
+	global := app.Group("/", middleware.JWTAuthentication(authService))
 
-	// rendered views
-	r.app.Get("/auth/register", r.authHandler.RegisterPage)
-	r.app.Get("/auth/login", r.authHandler.LoginPage)
-	// r.app.Get("*", r.errorHandler.NotFoundPage)
-	r.app.Get("/auth/register", r.authHandler.RegisterPage)
-
-
-	// api
-	r.app.Post("/api/auth/register", r.authHandler.Register)
-	r.app.Post("/api/auth/login", r.authHandler.Login)
-	r.app.Post("/api/auth/logout", r.authHandler.Logout)
-	r.app.Get("/api/auth/status", r.authHandler.Status)
-}
-
-func (r *Router) SetupProtectedRoutes() {
-	api := r.app.Group("/api", middleware.JWTAuthentication(r.authHandler.authService))
-	api.Get("/users/me", r.userHandler.GetCurrentUser)
-	api.Put("/users/me", r.userHandler.UpdateCurrentUser)
-	api.Get("/users", r.userHandler.GetByEmail)
-	
-	// rendered views
-	views := r.app.Group("/", middleware.JWTAuthentication(r.authHandler.authService))
-	views.Get("/", r.userHandler.HomePage)
-	views.Get("/profile", r.userHandler.ProfilePage)
-
+	auth.New(&auth.Config{
+		R:           global.Group("/auth"),
+		AuthService: authService,
+		UserService: userService,
+		Validate:    v,
+		Config:      config,
+	})
+	user.New(&user.Config{
+		R: global.Group("/users"),
+		UserService: userService,
+	})
+	public.New(&public.Config{
+		R: global.Group("/"),
+	})
+	error_handler.New(&error_handler.Config{
+		R: global.Group("/error"),
+	})
 }

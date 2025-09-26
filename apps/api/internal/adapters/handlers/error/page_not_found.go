@@ -1,4 +1,4 @@
-package handlers
+package error
 
 import (
 	"GoNext/base/pkg/templ"
@@ -6,13 +6,6 @@ import (
 
 	"github.com/gofiber/fiber/v2"
 )
-
-type ErrorHandler struct {
-}
-
-func NewErrorHandler() *ErrorHandler {
-	return &ErrorHandler{}
-}
 
 func (h *ErrorHandler) NotFoundPage(c *fiber.Ctx) error {
 	return templ.Render(c, error_views.NotFound())

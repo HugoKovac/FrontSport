@@ -2,16 +2,15 @@ package auth
 
 import (
 	"GoNext/base/templ/layouts"
-	"GoNext/base/templ/components"
+    "GoNext/base/templ/components"
 )
 
 templ Login(){
 	@layouts.BaseLayout(){
-        @components.NavBar(components.NavBarAttributes{Auth: false})
         <div class="h-full flex flex-col justify-center mx-auto">
             @components.Card(){
                     <h2 class="text-3xl font-bold">Login</h2>
-                    <form id="login-form" class="flex flex-col mt-6 px-2.5" hx-post="/api/auth/login" hx-target="#errorMsg">
+                    <form id="login-form" class="flex flex-col mt-6 px-2.5" hx-post="/auth/login" hx-target="#errorMsg">
                         <div class="flex flex-col my-2">
                             @components.Input(components.InputAttributes{
                                 Id: "email",

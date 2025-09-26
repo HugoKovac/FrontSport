@@ -1,0 +1,12 @@
+{
+    "editor.formatOnSave": true,
+    "[templ]": {
+        "editor.defaultFormatter": "vscode.html-language-features"
+    },
+    "tailwindCSS.includeLanguages": {
+        "templ": "html"
+    },
+    "emmet.includeLanguages": {
+        "templ": "html"
+    }
+}

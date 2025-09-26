@@ -2,12 +2,10 @@ package views
 
 import (
     "GoNext/base/templ/layouts"
-    "GoNext/base/templ/components"
 )
 
 templ PublicHome() {
     @layouts.BaseLayout(){
-        @components.NavBar(components.NavBarAttributes{Auth: false})
         <h1>Public Home</h1>
     }
 }

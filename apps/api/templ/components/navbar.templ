@@ -1,38 +1,31 @@
 package components
 
-type NavBarAttributes struct {
-    Auth bool
-}
-
-templ NavBar(attr NavBarAttributes){
-    <div id="navbar">
-        <div class="navbar bg-base-100 shadow-sm">
+templ NavBar(OOB bool){
+<div id="navbar" hx-swap-oob={OOB}>
+    <div class="navbar bg-base-100 shadow-sm">
         <div class="flex-1">
             <a class="btn btn-ghost text-xl" href="/">FrontSport</a>
         </div>
         <div class="flex gap-2">
             <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
-                <div class="w-10 rounded-full">
-                <img
-                    alt="Tailwind CSS Navbar component"
-                    src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
+                    <div class="w-10 rounded-full">
+                        <img alt="Tailwind CSS Navbar component"
+                            src="https://img.daisyui.com/images/stock/photo-1534528741775-53994a69daeb.webp" />
+                    </div>
                 </div>
-            </div>
-            <ul
-                tabindex="0"
-                class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                if attr.Auth {
+                <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+                    if ctx.Value("userID") != nil {
                     <li><a>Profile</a></li>
                     <li><a>Settings</a></li>
-                    <li><a hx-post="/api/auth/logout">Logout</a></li>
-                } else {
+                    <li><a hx-post="/auth/logout">Logout</a></li>
+                    } else {
                     <li><a href="/auth/login">Login</a></li>
                     <li><a href="/auth/register">Register</a></li>
-                }
-            </ul>
+                    }
+                </ul>
             </div>
         </div>
-        </div>
     </div>
+</div>
 }

@@ -39,9 +39,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	router := handlers.NewRouter(app, userRepo, config)
-	router.SetupPublicRoutes()
-	router.SetupProtectedRoutes()
+	handlers.InitHandlers(app, userRepo, config)
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

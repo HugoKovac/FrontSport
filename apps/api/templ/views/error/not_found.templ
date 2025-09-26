@@ -1,7 +1,13 @@
 package error
 
+import(
+    "GoNext/base/templ/layouts"
+)
+
 templ NotFound() {
-    <div>
-        <h1>NotFound</h1>
-    </div>
+    @layouts.BaseLayout(){
+        <div>
+            <h1>NotFound</h1>
+        </div>
+    }
 }

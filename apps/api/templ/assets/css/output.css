@@ -171,9 +171,6 @@
   .fixed {
     position: fixed;
   }
-  .static {
-    position: static;
-  }
   .z-1 {
     z-index: 1;
   }

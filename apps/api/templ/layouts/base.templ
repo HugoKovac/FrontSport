@@ -1,5 +1,7 @@
 package layouts
 
+import "GoNext/base/templ/components"
+
 templ BaseLayout() {
 <!DOCTYPE html>
 <html lang="en" class="h-full" data-theme="dim">
@@ -39,6 +41,7 @@ templ BaseLayout() {
         });
     </script>
     <main id="main" class="h-full flex flex-col">
+        @components.NavBar(false)
         { children... }
     </main>
 </body>
