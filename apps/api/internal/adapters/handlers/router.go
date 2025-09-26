@@ -35,7 +35,8 @@ func InitHandlers(app *fiber.App, userRepo ports.UserRepository, config *config.
 		Config:      config,
 	})
 	user.New(&user.Config{
-		R: global.Group("/users"),
+		R:           global.Group("/users"),
+		Validate:    v,
 		UserService: userService,
 	})
 	public.New(&public.Config{

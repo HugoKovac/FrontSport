@@ -1,0 +1,17 @@
+package components
+
+import "fmt"
+
+type ToastAttributes struct {
+    T string
+    Message string
+}
+
+templ Toast(attr ToastAttributes) {
+    <div id="toast" class="toast" hx-swap-oob="true" hx-trigger="load delay:5s"
+        hx-get="/empty">
+        <div class={fmt.Sprintf("alert alert-%s", attr.T)}>
+            <span>{attr.Message}</span>
+        </div>
+    </div>
+}

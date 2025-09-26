@@ -19,4 +19,5 @@ func New(c *Config) {
 
 func registerPublicRoute(s fiber.Router, h *PublicHandler) {
 	s.Get("/", h.HomePage)
+	s.Get("/empty", h.Empty)
 }

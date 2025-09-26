@@ -1,0 +1,76 @@
+package user
+
+import (
+	"GoNext/base/templ/layouts"
+	"GoNext/base/templ/components"
+	"GoNext/base/internal/core/domain"
+)
+
+templ Profile(user *domain.User){
+	@layouts.BaseLayout(){
+        <div class="h-full flex flex-col justify-center mx-auto">
+            @components.Card(){
+                    <h2 class="text-3xl font-bold">Profile</h2>
+                    <form id="register-form" class="flex flex-col mt-6 px-2.5" hx-put="/users" hx-target="#errorMsg">
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "firstname",
+                                Name: "firstname",
+                                Type: "text",
+                                Placeholder: "Firstname",
+                                Disabled: true,
+                                Value: user.Firstname,
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "lastname",
+                                Name: "lastname",
+                                Type: "text",
+                                Placeholder: "Lastname",
+                                Disabled: true,
+                                Value: user.Lastname,
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "email",
+                                Name: "email",
+                                Type: "text",
+                                Placeholder: "Email",
+                                Value: user.Email,
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "oldPassword",
+                                Name: "oldPassword",
+                                Type: "password",
+                                Placeholder: "Old Password",
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "newPassword",
+                                Name: "newPassword",
+                                Type: "password",
+                                Placeholder: "New Password",
+                            })
+                        </div>
+
+                        <div class="flex flex-col justify-between my-3.5 mt-6">
+                            @components.Button("register", "submit", true)
+                            <div class="my-1"></div>
+                            @components.Anchor("/auth/login", "login", false)
+                        </div>
+                        @components.ErrorMessage([]string{})
+                    </form>
+            }
+        </div>
+    }
+}
+

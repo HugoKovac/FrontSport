@@ -47,7 +47,7 @@ func NavBar(OOB bool) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		if ctx.Value("userID") != nil {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<li><a>Profile</a></li><li><a>Settings</a></li><li><a hx-post=\"/auth/logout\">Logout</a></li>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<li><a href=\"/users/profile\">Profile</a></li><li><a>Settings</a></li><li><a hx-post=\"/auth/logout\">Logout</a></li>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

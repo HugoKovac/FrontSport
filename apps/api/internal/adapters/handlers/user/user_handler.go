@@ -29,4 +29,6 @@ func New(c *Config) {
 
 func registerUserRoute(s fiber.Router, h *UserHandler) {
 	s.Get("/home", h.UserHomePage)
+	s.Get("/profile", h.UserProfilePage)
+	s.Put("/", h.UpdateUser)
 }

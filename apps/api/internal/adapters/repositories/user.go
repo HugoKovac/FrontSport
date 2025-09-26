@@ -29,6 +29,8 @@ func (r *UserRepository) toDomainUser(entUser *ent.User) *domain.User {
 
 	return &domain.User{
 		Id:        entUser.ID.String(),
+		Firstname: entUser.Firstname,
+		Lastname:  entUser.Lastname,
 		Email:     entUser.Email,
 		Password:  entUser.Password,
 		CreatedAt: entUser.CreatedAt,

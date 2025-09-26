@@ -9,6 +9,7 @@ type InputAttributes struct {
     Error bool
     Optional bool
     OOB bool
+    Disabled bool
 }
 
 templ Input(attr InputAttributes){
@@ -69,6 +70,9 @@ templ Input(attr InputAttributes){
             name={attr.Name}
             value={attr.Value}
             title="Must be more than 8 characters, including number, lowercase letter, uppercase letter"
+            if attr.Disabled {
+                disabled
+            }
         />
         </label>
     </div>
