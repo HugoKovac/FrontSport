@@ -21,6 +21,10 @@ const (
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
 	FieldUpdatedAt = "updated_at"
+	// FieldFirstname holds the string denoting the firstname field in the database.
+	FieldFirstname = "firstname"
+	// FieldLastname holds the string denoting the lastname field in the database.
+	FieldLastname = "lastname"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
 	// FieldPassword holds the string denoting the password field in the database.
@@ -54,6 +58,8 @@ var Columns = []string{
 	FieldID,
 	FieldCreatedAt,
 	FieldUpdatedAt,
+	FieldFirstname,
+	FieldLastname,
 	FieldEmail,
 	FieldPassword,
 	FieldRole,
@@ -76,6 +82,10 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
+	// FirstnameValidator is a validator for the "firstname" field. It is called by the builders before save.
+	FirstnameValidator func(string) error
+	// LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
+	LastnameValidator func(string) error
 	// PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	PasswordValidator func(string) error
 	// DefaultID holds the default value on creation for the "id" field.
@@ -110,6 +120,16 @@ func ByCreatedAt(opts ...sql.OrderTermOption) OrderOption {
 // ByUpdatedAt orders the results by the updated_at field.
 func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
+}
+
+// ByFirstname orders the results by the firstname field.
+func ByFirstname(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldFirstname, opts...).ToFunc()
+}
+
+// ByLastname orders the results by the lastname field.
+func ByLastname(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldLastname, opts...).ToFunc()
 }
 
 // ByEmail orders the results by the email field.

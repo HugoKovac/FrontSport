@@ -13,6 +13,24 @@ templ Register(){
                     <form id="register-form" class="flex flex-col mt-6 px-2.5" hx-post="/auth/register" hx-target="#errorMsg">
                         <div class="flex flex-col my-2">
                             @components.Input(components.InputAttributes{
+                                Id: "firstname",
+                                Name: "firstname",
+                                Type: "text",
+                                Placeholder: "Firstname",
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
+                                Id: "lastname",
+                                Name: "lastname",
+                                Type: "text",
+                                Placeholder: "Lastname",
+                            })
+                        </div>
+
+                        <div class="flex flex-col my-2">
+                            @components.Input(components.InputAttributes{
                                 Id: "email",
                                 Name: "email",
                                 Type: "text",

@@ -37,6 +37,46 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 	return uu
 }
 
+// SetFirstname sets the "firstname" field.
+func (uu *UserUpdate) SetFirstname(s string) *UserUpdate {
+	uu.mutation.SetFirstname(s)
+	return uu
+}
+
+// SetNillableFirstname sets the "firstname" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableFirstname(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetFirstname(*s)
+	}
+	return uu
+}
+
+// ClearFirstname clears the value of the "firstname" field.
+func (uu *UserUpdate) ClearFirstname() *UserUpdate {
+	uu.mutation.ClearFirstname()
+	return uu
+}
+
+// SetLastname sets the "lastname" field.
+func (uu *UserUpdate) SetLastname(s string) *UserUpdate {
+	uu.mutation.SetLastname(s)
+	return uu
+}
+
+// SetNillableLastname sets the "lastname" field if the given value is not nil.
+func (uu *UserUpdate) SetNillableLastname(s *string) *UserUpdate {
+	if s != nil {
+		uu.SetLastname(*s)
+	}
+	return uu
+}
+
+// ClearLastname clears the value of the "lastname" field.
+func (uu *UserUpdate) ClearLastname() *UserUpdate {
+	uu.mutation.ClearLastname()
+	return uu
+}
+
 // SetEmail sets the "email" field.
 func (uu *UserUpdate) SetEmail(s string) *UserUpdate {
 	uu.mutation.SetEmail(s)
@@ -194,6 +234,16 @@ func (uu *UserUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uu *UserUpdate) check() error {
+	if v, ok := uu.mutation.Firstname(); ok {
+		if err := user.FirstnameValidator(v); err != nil {
+			return &ValidationError{Name: "firstname", err: fmt.Errorf(`ent: validator failed for field "User.firstname": %w`, err)}
+		}
+	}
+	if v, ok := uu.mutation.Lastname(); ok {
+		if err := user.LastnameValidator(v); err != nil {
+			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
+		}
+	}
 	if v, ok := uu.mutation.Password(); ok {
 		if err := user.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
@@ -221,6 +271,18 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := uu.mutation.Firstname(); ok {
+		_spec.SetField(user.FieldFirstname, field.TypeString, value)
+	}
+	if uu.mutation.FirstnameCleared() {
+		_spec.ClearField(user.FieldFirstname, field.TypeString)
+	}
+	if value, ok := uu.mutation.Lastname(); ok {
+		_spec.SetField(user.FieldLastname, field.TypeString, value)
+	}
+	if uu.mutation.LastnameCleared() {
+		_spec.ClearField(user.FieldLastname, field.TypeString)
 	}
 	if value, ok := uu.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)
@@ -344,6 +406,46 @@ type UserUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 	uuo.mutation.SetUpdatedAt(t)
+	return uuo
+}
+
+// SetFirstname sets the "firstname" field.
+func (uuo *UserUpdateOne) SetFirstname(s string) *UserUpdateOne {
+	uuo.mutation.SetFirstname(s)
+	return uuo
+}
+
+// SetNillableFirstname sets the "firstname" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableFirstname(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetFirstname(*s)
+	}
+	return uuo
+}
+
+// ClearFirstname clears the value of the "firstname" field.
+func (uuo *UserUpdateOne) ClearFirstname() *UserUpdateOne {
+	uuo.mutation.ClearFirstname()
+	return uuo
+}
+
+// SetLastname sets the "lastname" field.
+func (uuo *UserUpdateOne) SetLastname(s string) *UserUpdateOne {
+	uuo.mutation.SetLastname(s)
+	return uuo
+}
+
+// SetNillableLastname sets the "lastname" field if the given value is not nil.
+func (uuo *UserUpdateOne) SetNillableLastname(s *string) *UserUpdateOne {
+	if s != nil {
+		uuo.SetLastname(*s)
+	}
+	return uuo
+}
+
+// ClearLastname clears the value of the "lastname" field.
+func (uuo *UserUpdateOne) ClearLastname() *UserUpdateOne {
+	uuo.mutation.ClearLastname()
 	return uuo
 }
 
@@ -517,6 +619,16 @@ func (uuo *UserUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (uuo *UserUpdateOne) check() error {
+	if v, ok := uuo.mutation.Firstname(); ok {
+		if err := user.FirstnameValidator(v); err != nil {
+			return &ValidationError{Name: "firstname", err: fmt.Errorf(`ent: validator failed for field "User.firstname": %w`, err)}
+		}
+	}
+	if v, ok := uuo.mutation.Lastname(); ok {
+		if err := user.LastnameValidator(v); err != nil {
+			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
+		}
+	}
 	if v, ok := uuo.mutation.Password(); ok {
 		if err := user.PasswordValidator(v); err != nil {
 			return &ValidationError{Name: "password", err: fmt.Errorf(`ent: validator failed for field "User.password": %w`, err)}
@@ -561,6 +673,18 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := uuo.mutation.Firstname(); ok {
+		_spec.SetField(user.FieldFirstname, field.TypeString, value)
+	}
+	if uuo.mutation.FirstnameCleared() {
+		_spec.ClearField(user.FieldFirstname, field.TypeString)
+	}
+	if value, ok := uuo.mutation.Lastname(); ok {
+		_spec.SetField(user.FieldLastname, field.TypeString, value)
+	}
+	if uuo.mutation.LastnameCleared() {
+		_spec.ClearField(user.FieldLastname, field.TypeString)
 	}
 	if value, ok := uuo.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)

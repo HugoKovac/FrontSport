@@ -52,6 +52,34 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
+// SetFirstname sets the "firstname" field.
+func (uc *UserCreate) SetFirstname(s string) *UserCreate {
+	uc.mutation.SetFirstname(s)
+	return uc
+}
+
+// SetNillableFirstname sets the "firstname" field if the given value is not nil.
+func (uc *UserCreate) SetNillableFirstname(s *string) *UserCreate {
+	if s != nil {
+		uc.SetFirstname(*s)
+	}
+	return uc
+}
+
+// SetLastname sets the "lastname" field.
+func (uc *UserCreate) SetLastname(s string) *UserCreate {
+	uc.mutation.SetLastname(s)
+	return uc
+}
+
+// SetNillableLastname sets the "lastname" field if the given value is not nil.
+func (uc *UserCreate) SetNillableLastname(s *string) *UserCreate {
+	if s != nil {
+		uc.SetLastname(*s)
+	}
+	return uc
+}
+
 // SetEmail sets the "email" field.
 func (uc *UserCreate) SetEmail(s string) *UserCreate {
 	uc.mutation.SetEmail(s)
@@ -183,6 +211,16 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
+	if v, ok := uc.mutation.Firstname(); ok {
+		if err := user.FirstnameValidator(v); err != nil {
+			return &ValidationError{Name: "firstname", err: fmt.Errorf(`ent: validator failed for field "User.firstname": %w`, err)}
+		}
+	}
+	if v, ok := uc.mutation.Lastname(); ok {
+		if err := user.LastnameValidator(v); err != nil {
+			return &ValidationError{Name: "lastname", err: fmt.Errorf(`ent: validator failed for field "User.lastname": %w`, err)}
+		}
+	}
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
@@ -244,6 +282,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.UpdatedAt(); ok {
 		_spec.SetField(user.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
+	}
+	if value, ok := uc.mutation.Firstname(); ok {
+		_spec.SetField(user.FieldFirstname, field.TypeString, value)
+		_node.Firstname = value
+	}
+	if value, ok := uc.mutation.Lastname(); ok {
+		_spec.SetField(user.FieldLastname, field.TypeString, value)
+		_node.Lastname = value
 	}
 	if value, ok := uc.mutation.Email(); ok {
 		_spec.SetField(user.FieldEmail, field.TypeString, value)

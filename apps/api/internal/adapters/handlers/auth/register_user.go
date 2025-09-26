@@ -51,8 +51,10 @@ func (h *AuthHandler) Register(c *fiber.Ctx) error {
 	}
 
 	_, err := h.UserService.Register(domain.User{
-		Email:    userDTO.Email,
-		Password: userDTO.Password,
+		Firstname: userDTO.Firstname,
+		Lastname:  userDTO.Lastname,
+		Email:     userDTO.Email,
+		Password:  userDTO.Password,
 	})
 	if err != nil {
 		c.Status(fiber.StatusUnprocessableEntity)

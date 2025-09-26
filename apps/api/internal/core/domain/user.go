@@ -4,6 +4,8 @@ import "time"
 
 type User struct {
 	Id        string    `json:"id"`
+	Firstname string    `json:"firstname"`
+	Lastname  string    `json:"lastname"`
 	Email     string    `json:"email"`
 	Password  string    `json:"password"`
 	CreatedAt time.Time `json:"created_at"`
@@ -13,6 +15,8 @@ type User struct {
 
 type UserFront struct {
 	Id        string    `json:"id"`
+	Firstname string    `json:"firstname"`
+	Lastname  string    `json:"lastname"`
 	Email     string    `json:"email"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
@@ -21,10 +25,12 @@ type UserFront struct {
 
 func (u *User) ToFront() *UserFront {
 	return &UserFront{
-		Id:    u.Id,
-		Email: u.Email,
+		Id:        u.Id,
+		Firstname: u.Firstname,
+		Lastname:  u.Lastname,
+		Email:     u.Email,
 		CreatedAt: u.CreatedAt,
 		UpdatedAt: u.UpdatedAt,
-		Role:  u.Role,
+		Role:      u.Role,
 	}
 }

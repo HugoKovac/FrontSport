@@ -66,8 +66,16 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescFirstname is the schema descriptor for firstname field.
+	userDescFirstname := userFields[1].Descriptor()
+	// user.FirstnameValidator is a validator for the "firstname" field. It is called by the builders before save.
+	user.FirstnameValidator = userDescFirstname.Validators[0].(func(string) error)
+	// userDescLastname is the schema descriptor for lastname field.
+	userDescLastname := userFields[2].Descriptor()
+	// user.LastnameValidator is a validator for the "lastname" field. It is called by the builders before save.
+	user.LastnameValidator = userDescLastname.Validators[0].(func(string) error)
 	// userDescPassword is the schema descriptor for password field.
-	userDescPassword := userFields[2].Descriptor()
+	userDescPassword := userFields[4].Descriptor()
 	// user.PasswordValidator is a validator for the "password" field. It is called by the builders before save.
 	user.PasswordValidator = userDescPassword.Validators[0].(func(string) error)
 	// userDescID is the schema descriptor for id field.

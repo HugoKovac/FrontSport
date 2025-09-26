@@ -6,7 +6,6 @@ import (
 	"GoNext/base/internal/core/domain"
 	"GoNext/base/internal/core/ports"
 	"context"
-	"fmt"
 	"log"
 	"time"
 
@@ -40,12 +39,19 @@ func (r *UserRepository) toDomainUser(entUser *ent.User) *domain.User {
 
 func (r *UserRepository) Create(user domain.User) (*domain.User, error) {
 	ctx := context.Background()
-	dUser, err := r.client.User.Create().SetEmail(user.Email).SetPassword(user.Password).SetID(uuid.New()).SetCreatedAt(time.Now()).SetUpdatedAt(time.Now()).Save(ctx)
+	dUser, err := r.client.User.Create().
+		SetEmail(user.Email).
+		SetFirstname(user.Firstname).
+		SetLastname(user.Lastname).
+		SetPassword(user.Password).
+		SetID(uuid.New()).
+		SetCreatedAt(time.Now()).
+		SetUpdatedAt(time.Now()).
+		Save(ctx)
 	if err != nil {
-		fmt.Println("Creating User: ", err)
+		log.Println("Creating User: ", err)
 		return nil, err
 	}
-	fmt.Println(user.Email, " user created")
 
 	return r.toDomainUser(dUser), nil
 }
