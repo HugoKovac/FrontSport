@@ -2,10 +2,23 @@ package views
 
 import (
     "GoNext/base/templ/layouts"
+    "GoNext/base/templ/components/set"
 )
 
 templ ProtectedHome(name string) {
     @layouts.BaseLayout(){
-        <h1>Hello, {name}</h1>
+        <div class="flex flex-col items-center">
+        <div id="exercises">
+        @set.Card("Bench Press"){
+            @set.Header()
+            @set.Exercise(set.ExerciseAttributes{
+                Index: 1,
+                PreviousWeight: 60,
+                PreviousReps: 12,
+            })
+        }
+        </div>
+        <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" hx-post="/set/add" hx-swap="beforeend" hx-target="#exercises">Add Exercise</button>
+        </div>
     }
 }

@@ -1,18 +1,24 @@
 package public
 
 import (
+	"GoNext/base/internal/core/ports"
+
 	"github.com/gofiber/fiber/v2"
 )
 
 type Config struct {
 	R fiber.Router
+	UserService ports.UserService
 }
 
 type PublicHandler struct {
+	UserService ports.UserService
 }
 
 func New(c *Config) {
-	h := &PublicHandler{}
+	h := &PublicHandler{
+		UserService: c.UserService,
+	}
 
 	registerPublicRoute(c.R, h)
 }
