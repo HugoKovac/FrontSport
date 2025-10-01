@@ -6,7 +6,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 const (
@@ -20,28 +19,12 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldName holds the string denoting the name field in the database.
 	FieldName = "name"
-	// FieldURL holds the string denoting the url field in the database.
-	FieldURL = "url"
-	// EdgePrograms holds the string denoting the programs edge name in mutations.
-	EdgePrograms = "programs"
-	// EdgeWorkouts holds the string denoting the workouts edge name in mutations.
-	EdgeWorkouts = "workouts"
+	// FieldVideoURL holds the string denoting the video_url field in the database.
+	FieldVideoURL = "video_url"
+	// FieldImageURL holds the string denoting the image_url field in the database.
+	FieldImageURL = "image_url"
 	// Table holds the table name of the exercise in the database.
 	Table = "exercises"
-	// ProgramsTable is the table that holds the programs relation/edge.
-	ProgramsTable = "exercises"
-	// ProgramsInverseTable is the table name for the Program entity.
-	// It exists in this package in order to avoid circular dependency with the "program" package.
-	ProgramsInverseTable = "programs"
-	// ProgramsColumn is the table column denoting the programs relation/edge.
-	ProgramsColumn = "program_exercises"
-	// WorkoutsTable is the table that holds the workouts relation/edge.
-	WorkoutsTable = "exercises"
-	// WorkoutsInverseTable is the table name for the Workout entity.
-	// It exists in this package in order to avoid circular dependency with the "workout" package.
-	WorkoutsInverseTable = "workouts"
-	// WorkoutsColumn is the table column denoting the workouts relation/edge.
-	WorkoutsColumn = "workout_exercises"
 )
 
 // Columns holds all SQL columns for exercise fields.
@@ -50,25 +33,14 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldName,
-	FieldURL,
-}
-
-// ForeignKeys holds the SQL foreign-keys that are owned by the "exercises"
-// table and are not defined as standalone fields in the schema.
-var ForeignKeys = []string{
-	"program_exercises",
-	"workout_exercises",
+	FieldVideoURL,
+	FieldImageURL,
 }
 
 // ValidColumn reports if the column name is valid (part of the table columns).
 func ValidColumn(column string) bool {
 	for i := range Columns {
 		if column == Columns[i] {
-			return true
-		}
-	}
-	for i := range ForeignKeys {
-		if column == ForeignKeys[i] {
 			return true
 		}
 	}
@@ -82,8 +54,10 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// UpdateDefaultUpdatedAt holds the default value on update for the "updated_at" field.
 	UpdateDefaultUpdatedAt func() time.Time
-	// URLValidator is a validator for the "url" field. It is called by the builders before save.
-	URLValidator func(string) error
+	// VideoURLValidator is a validator for the "video_url" field. It is called by the builders before save.
+	VideoURLValidator func(string) error
+	// ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	ImageURLValidator func(string) error
 )
 
 // OrderOption defines the ordering options for the Exercise queries.
@@ -104,40 +78,17 @@ func ByUpdatedAt(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldUpdatedAt, opts...).ToFunc()
 }
 
-// ByName orders the results by the Name field.
+// ByName orders the results by the name field.
 func ByName(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldName, opts...).ToFunc()
 }
 
-// ByURL orders the results by the url field.
-func ByURL(opts ...sql.OrderTermOption) OrderOption {
-	return sql.OrderByField(FieldURL, opts...).ToFunc()
+// ByVideoURL orders the results by the video_url field.
+func ByVideoURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldVideoURL, opts...).ToFunc()
 }
 
-// ByProgramsField orders the results by programs field.
-func ByProgramsField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProgramsStep(), sql.OrderByField(field, opts...))
-	}
-}
-
-// ByWorkoutsField orders the results by workouts field.
-func ByWorkoutsField(field string, opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWorkoutsStep(), sql.OrderByField(field, opts...))
-	}
-}
-func newProgramsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProgramsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, ProgramsTable, ProgramsColumn),
-	)
-}
-func newWorkoutsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WorkoutsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.M2O, true, WorkoutsTable, WorkoutsColumn),
-	)
+// ByImageURL orders the results by the image_url field.
+func ByImageURL(opts ...sql.OrderTermOption) OrderOption {
+	return sql.OrderByField(FieldImageURL, opts...).ToFunc()
 }

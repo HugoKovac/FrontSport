@@ -11,3 +11,7 @@ type UserRepository interface {
 	Update(user *domain.User) error
 	Delete(id string) error
 }
+
+type ExerciseRepository interface {
+	GetExercises() ([]*domain.Exercise, error)
+}

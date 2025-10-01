@@ -1,19 +1,19 @@
-package set
+package exercise
 
-type ExerciseAttributes struct {
+type SetAttributes struct {
     Index int
     PreviousWeight int
     PreviousReps int
 }
 
-templ Exercise(attr ExerciseAttributes){
+templ Set(attr SetAttributes){
     <tr>
         <th>{attr.Index}</th>
         <td>{attr.PreviousWeight} kg x {attr.PreviousReps}</td>
         <td>
             <input
                 type="number"
-                class="input validator"
+                class="input validator min-w-24"
                 required
                 placeholder="reps"
                 />
@@ -21,7 +21,7 @@ templ Exercise(attr ExerciseAttributes){
         <td>
             <input
                 type="number"
-                class="input validator"
+                class="input validator min-w-24"
                 required
                 placeholder="kg"
                 />

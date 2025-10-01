@@ -4,10 +4,8 @@ package ent
 
 import (
 	"GoNext/base/ent/exercise"
-	"GoNext/base/ent/program"
 	"GoNext/base/ent/schema"
 	"GoNext/base/ent/user"
-	"GoNext/base/ent/workout"
 	"time"
 
 	"github.com/google/uuid"
@@ -32,25 +30,14 @@ func init() {
 	exercise.DefaultUpdatedAt = exerciseDescUpdatedAt.Default.(func() time.Time)
 	// exercise.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	exercise.UpdateDefaultUpdatedAt = exerciseDescUpdatedAt.UpdateDefault.(func() time.Time)
-	// exerciseDescURL is the schema descriptor for url field.
-	exerciseDescURL := exerciseFields[1].Descriptor()
-	// exercise.URLValidator is a validator for the "url" field. It is called by the builders before save.
-	exercise.URLValidator = exerciseDescURL.Validators[0].(func(string) error)
-	programMixin := schema.Program{}.Mixin()
-	programMixinFields0 := programMixin[0].Fields()
-	_ = programMixinFields0
-	programFields := schema.Program{}.Fields()
-	_ = programFields
-	// programDescCreatedAt is the schema descriptor for created_at field.
-	programDescCreatedAt := programMixinFields0[0].Descriptor()
-	// program.DefaultCreatedAt holds the default value on creation for the created_at field.
-	program.DefaultCreatedAt = programDescCreatedAt.Default.(func() time.Time)
-	// programDescUpdatedAt is the schema descriptor for updated_at field.
-	programDescUpdatedAt := programMixinFields0[1].Descriptor()
-	// program.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	program.DefaultUpdatedAt = programDescUpdatedAt.Default.(func() time.Time)
-	// program.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	program.UpdateDefaultUpdatedAt = programDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// exerciseDescVideoURL is the schema descriptor for video_url field.
+	exerciseDescVideoURL := exerciseFields[1].Descriptor()
+	// exercise.VideoURLValidator is a validator for the "video_url" field. It is called by the builders before save.
+	exercise.VideoURLValidator = exerciseDescVideoURL.Validators[0].(func(string) error)
+	// exerciseDescImageURL is the schema descriptor for image_url field.
+	exerciseDescImageURL := exerciseFields[2].Descriptor()
+	// exercise.ImageURLValidator is a validator for the "image_url" field. It is called by the builders before save.
+	exercise.ImageURLValidator = exerciseDescImageURL.Validators[0].(func(string) error)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
@@ -82,19 +69,4 @@ func init() {
 	userDescID := userFields[0].Descriptor()
 	// user.DefaultID holds the default value on creation for the id field.
 	user.DefaultID = userDescID.Default.(func() uuid.UUID)
-	workoutMixin := schema.Workout{}.Mixin()
-	workoutMixinFields0 := workoutMixin[0].Fields()
-	_ = workoutMixinFields0
-	workoutFields := schema.Workout{}.Fields()
-	_ = workoutFields
-	// workoutDescCreatedAt is the schema descriptor for created_at field.
-	workoutDescCreatedAt := workoutMixinFields0[0].Descriptor()
-	// workout.DefaultCreatedAt holds the default value on creation for the created_at field.
-	workout.DefaultCreatedAt = workoutDescCreatedAt.Default.(func() time.Time)
-	// workoutDescUpdatedAt is the schema descriptor for updated_at field.
-	workoutDescUpdatedAt := workoutMixinFields0[1].Descriptor()
-	// workout.DefaultUpdatedAt holds the default value on creation for the updated_at field.
-	workout.DefaultUpdatedAt = workoutDescUpdatedAt.Default.(func() time.Time)
-	// workout.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
-	workout.UpdateDefaultUpdatedAt = workoutDescUpdatedAt.UpdateDefault.(func() time.Time)
 }

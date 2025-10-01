@@ -9,11 +9,5 @@ import (
 // Exercise is the predicate function for exercise builders.
 type Exercise func(*sql.Selector)
 
-// Program is the predicate function for program builders.
-type Program func(*sql.Selector)
-
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
-
-// Workout is the predicate function for workout builders.
-type Workout func(*sql.Selector)

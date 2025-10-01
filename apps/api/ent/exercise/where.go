@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -65,14 +64,19 @@ func UpdatedAt(v time.Time) predicate.Exercise {
 	return predicate.Exercise(sql.FieldEQ(FieldUpdatedAt, v))
 }
 
-// Name applies equality check predicate on the "Name" field. It's identical to NameEQ.
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
 func Name(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldEQ(FieldName, v))
 }
 
-// URL applies equality check predicate on the "url" field. It's identical to URLEQ.
-func URL(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldEQ(FieldURL, v))
+// VideoURL applies equality check predicate on the "video_url" field. It's identical to VideoURLEQ.
+func VideoURL(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEQ(FieldVideoURL, v))
+}
+
+// ImageURL applies equality check predicate on the "image_url" field. It's identical to ImageURLEQ.
+func ImageURL(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEQ(FieldImageURL, v))
 }
 
 // CreatedAtEQ applies the EQ predicate on the "created_at" field.
@@ -155,180 +159,219 @@ func UpdatedAtLTE(v time.Time) predicate.Exercise {
 	return predicate.Exercise(sql.FieldLTE(FieldUpdatedAt, v))
 }
 
-// NameEQ applies the EQ predicate on the "Name" field.
+// NameEQ applies the EQ predicate on the "name" field.
 func NameEQ(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldEQ(FieldName, v))
 }
 
-// NameNEQ applies the NEQ predicate on the "Name" field.
+// NameNEQ applies the NEQ predicate on the "name" field.
 func NameNEQ(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldNEQ(FieldName, v))
 }
 
-// NameIn applies the In predicate on the "Name" field.
+// NameIn applies the In predicate on the "name" field.
 func NameIn(vs ...string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldIn(FieldName, vs...))
 }
 
-// NameNotIn applies the NotIn predicate on the "Name" field.
+// NameNotIn applies the NotIn predicate on the "name" field.
 func NameNotIn(vs ...string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldNotIn(FieldName, vs...))
 }
 
-// NameGT applies the GT predicate on the "Name" field.
+// NameGT applies the GT predicate on the "name" field.
 func NameGT(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldGT(FieldName, v))
 }
 
-// NameGTE applies the GTE predicate on the "Name" field.
+// NameGTE applies the GTE predicate on the "name" field.
 func NameGTE(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldGTE(FieldName, v))
 }
 
-// NameLT applies the LT predicate on the "Name" field.
+// NameLT applies the LT predicate on the "name" field.
 func NameLT(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldLT(FieldName, v))
 }
 
-// NameLTE applies the LTE predicate on the "Name" field.
+// NameLTE applies the LTE predicate on the "name" field.
 func NameLTE(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldLTE(FieldName, v))
 }
 
-// NameContains applies the Contains predicate on the "Name" field.
+// NameContains applies the Contains predicate on the "name" field.
 func NameContains(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldContains(FieldName, v))
 }
 
-// NameHasPrefix applies the HasPrefix predicate on the "Name" field.
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
 func NameHasPrefix(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldHasPrefix(FieldName, v))
 }
 
-// NameHasSuffix applies the HasSuffix predicate on the "Name" field.
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
 func NameHasSuffix(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldHasSuffix(FieldName, v))
 }
 
-// NameEqualFold applies the EqualFold predicate on the "Name" field.
+// NameEqualFold applies the EqualFold predicate on the "name" field.
 func NameEqualFold(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldEqualFold(FieldName, v))
 }
 
-// NameContainsFold applies the ContainsFold predicate on the "Name" field.
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
 func NameContainsFold(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldContainsFold(FieldName, v))
 }
 
-// URLEQ applies the EQ predicate on the "url" field.
-func URLEQ(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldEQ(FieldURL, v))
+// VideoURLEQ applies the EQ predicate on the "video_url" field.
+func VideoURLEQ(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEQ(FieldVideoURL, v))
 }
 
-// URLNEQ applies the NEQ predicate on the "url" field.
-func URLNEQ(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldNEQ(FieldURL, v))
+// VideoURLNEQ applies the NEQ predicate on the "video_url" field.
+func VideoURLNEQ(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldNEQ(FieldVideoURL, v))
 }
 
-// URLIn applies the In predicate on the "url" field.
-func URLIn(vs ...string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldIn(FieldURL, vs...))
+// VideoURLIn applies the In predicate on the "video_url" field.
+func VideoURLIn(vs ...string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldIn(FieldVideoURL, vs...))
 }
 
-// URLNotIn applies the NotIn predicate on the "url" field.
-func URLNotIn(vs ...string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldNotIn(FieldURL, vs...))
+// VideoURLNotIn applies the NotIn predicate on the "video_url" field.
+func VideoURLNotIn(vs ...string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldNotIn(FieldVideoURL, vs...))
 }
 
-// URLGT applies the GT predicate on the "url" field.
-func URLGT(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldGT(FieldURL, v))
+// VideoURLGT applies the GT predicate on the "video_url" field.
+func VideoURLGT(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldGT(FieldVideoURL, v))
 }
 
-// URLGTE applies the GTE predicate on the "url" field.
-func URLGTE(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldGTE(FieldURL, v))
+// VideoURLGTE applies the GTE predicate on the "video_url" field.
+func VideoURLGTE(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldGTE(FieldVideoURL, v))
 }
 
-// URLLT applies the LT predicate on the "url" field.
-func URLLT(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldLT(FieldURL, v))
+// VideoURLLT applies the LT predicate on the "video_url" field.
+func VideoURLLT(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldLT(FieldVideoURL, v))
 }
 
-// URLLTE applies the LTE predicate on the "url" field.
-func URLLTE(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldLTE(FieldURL, v))
+// VideoURLLTE applies the LTE predicate on the "video_url" field.
+func VideoURLLTE(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldLTE(FieldVideoURL, v))
 }
 
-// URLContains applies the Contains predicate on the "url" field.
-func URLContains(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldContains(FieldURL, v))
+// VideoURLContains applies the Contains predicate on the "video_url" field.
+func VideoURLContains(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldContains(FieldVideoURL, v))
 }
 
-// URLHasPrefix applies the HasPrefix predicate on the "url" field.
-func URLHasPrefix(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldHasPrefix(FieldURL, v))
+// VideoURLHasPrefix applies the HasPrefix predicate on the "video_url" field.
+func VideoURLHasPrefix(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldHasPrefix(FieldVideoURL, v))
 }
 
-// URLHasSuffix applies the HasSuffix predicate on the "url" field.
-func URLHasSuffix(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldHasSuffix(FieldURL, v))
+// VideoURLHasSuffix applies the HasSuffix predicate on the "video_url" field.
+func VideoURLHasSuffix(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldHasSuffix(FieldVideoURL, v))
 }
 
-// URLEqualFold applies the EqualFold predicate on the "url" field.
-func URLEqualFold(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldEqualFold(FieldURL, v))
+// VideoURLIsNil applies the IsNil predicate on the "video_url" field.
+func VideoURLIsNil() predicate.Exercise {
+	return predicate.Exercise(sql.FieldIsNull(FieldVideoURL))
 }
 
-// URLContainsFold applies the ContainsFold predicate on the "url" field.
-func URLContainsFold(v string) predicate.Exercise {
-	return predicate.Exercise(sql.FieldContainsFold(FieldURL, v))
+// VideoURLNotNil applies the NotNil predicate on the "video_url" field.
+func VideoURLNotNil() predicate.Exercise {
+	return predicate.Exercise(sql.FieldNotNull(FieldVideoURL))
 }
 
-// HasPrograms applies the HasEdge predicate on the "programs" edge.
-func HasPrograms() predicate.Exercise {
-	return predicate.Exercise(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, ProgramsTable, ProgramsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// VideoURLEqualFold applies the EqualFold predicate on the "video_url" field.
+func VideoURLEqualFold(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEqualFold(FieldVideoURL, v))
 }
 
-// HasProgramsWith applies the HasEdge predicate on the "programs" edge with a given conditions (other predicates).
-func HasProgramsWith(preds ...predicate.Program) predicate.Exercise {
-	return predicate.Exercise(func(s *sql.Selector) {
-		step := newProgramsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// VideoURLContainsFold applies the ContainsFold predicate on the "video_url" field.
+func VideoURLContainsFold(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldContainsFold(FieldVideoURL, v))
 }
 
-// HasWorkouts applies the HasEdge predicate on the "workouts" edge.
-func HasWorkouts() predicate.Exercise {
-	return predicate.Exercise(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, WorkoutsTable, WorkoutsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
+// ImageURLEQ applies the EQ predicate on the "image_url" field.
+func ImageURLEQ(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEQ(FieldImageURL, v))
 }
 
-// HasWorkoutsWith applies the HasEdge predicate on the "workouts" edge with a given conditions (other predicates).
-func HasWorkoutsWith(preds ...predicate.Workout) predicate.Exercise {
-	return predicate.Exercise(func(s *sql.Selector) {
-		step := newWorkoutsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
+// ImageURLNEQ applies the NEQ predicate on the "image_url" field.
+func ImageURLNEQ(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldNEQ(FieldImageURL, v))
+}
+
+// ImageURLIn applies the In predicate on the "image_url" field.
+func ImageURLIn(vs ...string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldIn(FieldImageURL, vs...))
+}
+
+// ImageURLNotIn applies the NotIn predicate on the "image_url" field.
+func ImageURLNotIn(vs ...string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldNotIn(FieldImageURL, vs...))
+}
+
+// ImageURLGT applies the GT predicate on the "image_url" field.
+func ImageURLGT(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldGT(FieldImageURL, v))
+}
+
+// ImageURLGTE applies the GTE predicate on the "image_url" field.
+func ImageURLGTE(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldGTE(FieldImageURL, v))
+}
+
+// ImageURLLT applies the LT predicate on the "image_url" field.
+func ImageURLLT(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldLT(FieldImageURL, v))
+}
+
+// ImageURLLTE applies the LTE predicate on the "image_url" field.
+func ImageURLLTE(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldLTE(FieldImageURL, v))
+}
+
+// ImageURLContains applies the Contains predicate on the "image_url" field.
+func ImageURLContains(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldContains(FieldImageURL, v))
+}
+
+// ImageURLHasPrefix applies the HasPrefix predicate on the "image_url" field.
+func ImageURLHasPrefix(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldHasPrefix(FieldImageURL, v))
+}
+
+// ImageURLHasSuffix applies the HasSuffix predicate on the "image_url" field.
+func ImageURLHasSuffix(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldHasSuffix(FieldImageURL, v))
+}
+
+// ImageURLIsNil applies the IsNil predicate on the "image_url" field.
+func ImageURLIsNil() predicate.Exercise {
+	return predicate.Exercise(sql.FieldIsNull(FieldImageURL))
+}
+
+// ImageURLNotNil applies the NotNil predicate on the "image_url" field.
+func ImageURLNotNil() predicate.Exercise {
+	return predicate.Exercise(sql.FieldNotNull(FieldImageURL))
+}
+
+// ImageURLEqualFold applies the EqualFold predicate on the "image_url" field.
+func ImageURLEqualFold(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldEqualFold(FieldImageURL, v))
+}
+
+// ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
+func ImageURLContainsFold(v string) predicate.Exercise {
+	return predicate.Exercise(sql.FieldContainsFold(FieldImageURL, v))
 }
 
 // And groups predicates with the AND operator between them.

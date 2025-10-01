@@ -3,9 +3,7 @@
 package ent
 
 import (
-	"GoNext/base/ent/program"
 	"GoNext/base/ent/user"
-	"GoNext/base/ent/workout"
 	"GoNext/base/internal/primitive/userprimitive"
 	"context"
 	"errors"
@@ -118,36 +116,6 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
-}
-
-// AddProgramIDs adds the "programs" edge to the Program entity by IDs.
-func (uc *UserCreate) AddProgramIDs(ids ...int) *UserCreate {
-	uc.mutation.AddProgramIDs(ids...)
-	return uc
-}
-
-// AddPrograms adds the "programs" edges to the Program entity.
-func (uc *UserCreate) AddPrograms(p ...*Program) *UserCreate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uc.AddProgramIDs(ids...)
-}
-
-// AddWorkoutIDs adds the "workouts" edge to the Workout entity by IDs.
-func (uc *UserCreate) AddWorkoutIDs(ids ...int) *UserCreate {
-	uc.mutation.AddWorkoutIDs(ids...)
-	return uc
-}
-
-// AddWorkouts adds the "workouts" edges to the Workout entity.
-func (uc *UserCreate) AddWorkouts(w ...*Workout) *UserCreate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return uc.AddWorkoutIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -302,38 +270,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = value
-	}
-	if nodes := uc.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

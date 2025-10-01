@@ -5,8 +5,6 @@ package ent
 import (
 	"GoNext/base/ent/exercise"
 	"GoNext/base/ent/predicate"
-	"GoNext/base/ent/program"
-	"GoNext/base/ent/workout"
 	"context"
 	"fmt"
 	"math"
@@ -20,13 +18,10 @@ import (
 // ExerciseQuery is the builder for querying Exercise entities.
 type ExerciseQuery struct {
 	config
-	ctx          *QueryContext
-	order        []exercise.OrderOption
-	inters       []Interceptor
-	predicates   []predicate.Exercise
-	withPrograms *ProgramQuery
-	withWorkouts *WorkoutQuery
-	withFKs      bool
+	ctx        *QueryContext
+	order      []exercise.OrderOption
+	inters     []Interceptor
+	predicates []predicate.Exercise
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -61,50 +56,6 @@ func (eq *ExerciseQuery) Unique(unique bool) *ExerciseQuery {
 func (eq *ExerciseQuery) Order(o ...exercise.OrderOption) *ExerciseQuery {
 	eq.order = append(eq.order, o...)
 	return eq
-}
-
-// QueryPrograms chains the current query on the "programs" edge.
-func (eq *ExerciseQuery) QueryPrograms() *ProgramQuery {
-	query := (&ProgramClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(exercise.Table, exercise.FieldID, selector),
-			sqlgraph.To(program.Table, program.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, exercise.ProgramsTable, exercise.ProgramsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryWorkouts chains the current query on the "workouts" edge.
-func (eq *ExerciseQuery) QueryWorkouts() *WorkoutQuery {
-	query := (&WorkoutClient{config: eq.config}).Query()
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := eq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := eq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(exercise.Table, exercise.FieldID, selector),
-			sqlgraph.To(workout.Table, workout.FieldID),
-			sqlgraph.Edge(sqlgraph.M2O, true, exercise.WorkoutsTable, exercise.WorkoutsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(eq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first Exercise entity from the query.
@@ -294,39 +245,15 @@ func (eq *ExerciseQuery) Clone() *ExerciseQuery {
 		return nil
 	}
 	return &ExerciseQuery{
-		config:       eq.config,
-		ctx:          eq.ctx.Clone(),
-		order:        append([]exercise.OrderOption{}, eq.order...),
-		inters:       append([]Interceptor{}, eq.inters...),
-		predicates:   append([]predicate.Exercise{}, eq.predicates...),
-		withPrograms: eq.withPrograms.Clone(),
-		withWorkouts: eq.withWorkouts.Clone(),
+		config:     eq.config,
+		ctx:        eq.ctx.Clone(),
+		order:      append([]exercise.OrderOption{}, eq.order...),
+		inters:     append([]Interceptor{}, eq.inters...),
+		predicates: append([]predicate.Exercise{}, eq.predicates...),
 		// clone intermediate query.
 		sql:  eq.sql.Clone(),
 		path: eq.path,
 	}
-}
-
-// WithPrograms tells the query-builder to eager-load the nodes that are connected to
-// the "programs" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *ExerciseQuery) WithPrograms(opts ...func(*ProgramQuery)) *ExerciseQuery {
-	query := (&ProgramClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withPrograms = query
-	return eq
-}
-
-// WithWorkouts tells the query-builder to eager-load the nodes that are connected to
-// the "workouts" edge. The optional arguments are used to configure the query builder of the edge.
-func (eq *ExerciseQuery) WithWorkouts(opts ...func(*WorkoutQuery)) *ExerciseQuery {
-	query := (&WorkoutClient{config: eq.config}).Query()
-	for _, opt := range opts {
-		opt(query)
-	}
-	eq.withWorkouts = query
-	return eq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -405,27 +332,15 @@ func (eq *ExerciseQuery) prepareQuery(ctx context.Context) error {
 
 func (eq *ExerciseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exercise, error) {
 	var (
-		nodes       = []*Exercise{}
-		withFKs     = eq.withFKs
-		_spec       = eq.querySpec()
-		loadedTypes = [2]bool{
-			eq.withPrograms != nil,
-			eq.withWorkouts != nil,
-		}
+		nodes = []*Exercise{}
+		_spec = eq.querySpec()
 	)
-	if eq.withPrograms != nil || eq.withWorkouts != nil {
-		withFKs = true
-	}
-	if withFKs {
-		_spec.Node.Columns = append(_spec.Node.Columns, exercise.ForeignKeys...)
-	}
 	_spec.ScanValues = func(columns []string) ([]any, error) {
 		return (*Exercise).scanValues(nil, columns)
 	}
 	_spec.Assign = func(columns []string, values []any) error {
 		node := &Exercise{config: eq.config}
 		nodes = append(nodes, node)
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	for i := range hooks {
@@ -437,84 +352,7 @@ func (eq *ExerciseQuery) sqlAll(ctx context.Context, hooks ...queryHook) ([]*Exe
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-	if query := eq.withPrograms; query != nil {
-		if err := eq.loadPrograms(ctx, query, nodes, nil,
-			func(n *Exercise, e *Program) { n.Edges.Programs = e }); err != nil {
-			return nil, err
-		}
-	}
-	if query := eq.withWorkouts; query != nil {
-		if err := eq.loadWorkouts(ctx, query, nodes, nil,
-			func(n *Exercise, e *Workout) { n.Edges.Workouts = e }); err != nil {
-			return nil, err
-		}
-	}
 	return nodes, nil
-}
-
-func (eq *ExerciseQuery) loadPrograms(ctx context.Context, query *ProgramQuery, nodes []*Exercise, init func(*Exercise), assign func(*Exercise, *Program)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Exercise)
-	for i := range nodes {
-		if nodes[i].program_exercises == nil {
-			continue
-		}
-		fk := *nodes[i].program_exercises
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(program.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "program_exercises" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
-}
-func (eq *ExerciseQuery) loadWorkouts(ctx context.Context, query *WorkoutQuery, nodes []*Exercise, init func(*Exercise), assign func(*Exercise, *Workout)) error {
-	ids := make([]int, 0, len(nodes))
-	nodeids := make(map[int][]*Exercise)
-	for i := range nodes {
-		if nodes[i].workout_exercises == nil {
-			continue
-		}
-		fk := *nodes[i].workout_exercises
-		if _, ok := nodeids[fk]; !ok {
-			ids = append(ids, fk)
-		}
-		nodeids[fk] = append(nodeids[fk], nodes[i])
-	}
-	if len(ids) == 0 {
-		return nil
-	}
-	query.Where(workout.IDIn(ids...))
-	neighbors, err := query.All(ctx)
-	if err != nil {
-		return err
-	}
-	for _, n := range neighbors {
-		nodes, ok := nodeids[n.ID]
-		if !ok {
-			return fmt.Errorf(`unexpected foreign-key "workout_exercises" returned %v`, n.ID)
-		}
-		for i := range nodes {
-			assign(nodes[i], n)
-		}
-	}
-	return nil
 }
 
 func (eq *ExerciseQuery) sqlCount(ctx context.Context) (int, error) {

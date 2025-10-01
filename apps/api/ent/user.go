@@ -32,40 +32,8 @@ type User struct {
 	// Password holds the value of the "password" field.
 	Password string `json:"password,omitempty"`
 	// Role holds the value of the "role" field.
-	Role userprimitive.Roles `json:"role,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges        UserEdges `json:"edges"`
+	Role         userprimitive.Roles `json:"role,omitempty"`
 	selectValues sql.SelectValues
-}
-
-// UserEdges holds the relations/edges for other nodes in the graph.
-type UserEdges struct {
-	// Programs holds the value of the programs edge.
-	Programs []*Program `json:"programs,omitempty"`
-	// Workouts holds the value of the workouts edge.
-	Workouts []*Workout `json:"workouts,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// ProgramsOrErr returns the Programs value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) ProgramsOrErr() ([]*Program, error) {
-	if e.loadedTypes[0] {
-		return e.Programs, nil
-	}
-	return nil, &NotLoadedError{edge: "programs"}
-}
-
-// WorkoutsOrErr returns the Workouts value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) WorkoutsOrErr() ([]*Workout, error) {
-	if e.loadedTypes[1] {
-		return e.Workouts, nil
-	}
-	return nil, &NotLoadedError{edge: "workouts"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -153,16 +121,6 @@ func (u *User) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (u *User) Value(name string) (ent.Value, error) {
 	return u.selectValues.Get(name)
-}
-
-// QueryPrograms queries the "programs" edge of the User entity.
-func (u *User) QueryPrograms() *ProgramQuery {
-	return NewUserClient(u.config).QueryPrograms(u)
-}
-
-// QueryWorkouts queries the "workouts" edge of the User entity.
-func (u *User) QueryWorkouts() *WorkoutQuery {
-	return NewUserClient(u.config).QueryWorkouts(u)
 }
 
 // Update returns a builder for updating this User.

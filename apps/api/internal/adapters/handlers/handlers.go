@@ -5,7 +5,7 @@ import (
 	error_handler "GoNext/base/internal/adapters/handlers/error"
 	"GoNext/base/internal/adapters/handlers/public"
 	"GoNext/base/internal/adapters/handlers/user"
-	"GoNext/base/internal/adapters/handlers/set"
+	"GoNext/base/internal/adapters/handlers/exercise"
 	"GoNext/base/internal/core/ports"
 	"GoNext/base/internal/core/services"
 	"GoNext/base/internal/middleware"
@@ -16,10 +16,11 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitHandlers(app *fiber.App, userRepo ports.UserRepository, config *config.Config) {
+func InitHandlers(app *fiber.App, userRepo ports.UserRepository, exerciseRepo ports.ExerciseRepository, config *config.Config) {
 
 	authService := services.NewAuthService(userRepo, config.Jwt.Secret)
 	userService := services.NewUserService(userRepo)
+	exerciseService := services.NewExerciseService(exerciseRepo)
 
 	v := validator.New()
 	customvalidator.RegisterCustomValidators(v)
@@ -44,8 +45,9 @@ func InitHandlers(app *fiber.App, userRepo ports.UserRepository, config *config.
 		R: global.Group("/"),
 		UserService: userService,
 	})
-	set.New(&set.Config{
-		R: global.Group("/set"),
+	exercise.New(&exercise.Config{
+		R: global.Group("/exercise"),
+		ExerciseService: exerciseService,
 	})
 	error_handler.New(&error_handler.Config{
 		R: global.Group("/error"),

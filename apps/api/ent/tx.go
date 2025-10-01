@@ -14,12 +14,8 @@ type Tx struct {
 	config
 	// Exercise is the client for interacting with the Exercise builders.
 	Exercise *ExerciseClient
-	// Program is the client for interacting with the Program builders.
-	Program *ProgramClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
-	// Workout is the client for interacting with the Workout builders.
-	Workout *WorkoutClient
 
 	// lazily loaded.
 	client     *Client
@@ -152,9 +148,7 @@ func (tx *Tx) Client() *Client {
 
 func (tx *Tx) init() {
 	tx.Exercise = NewExerciseClient(tx.config)
-	tx.Program = NewProgramClient(tx.config)
 	tx.User = NewUserClient(tx.config)
-	tx.Workout = NewWorkoutClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

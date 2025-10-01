@@ -5,7 +5,6 @@ import (
 	"GoNext/base/internal/primitive/userprimitive"
 
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -29,10 +28,7 @@ func (User) Fields() []ent.Field {
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("programs", Program.Type),
-		edge.To("workouts", Workout.Type),
-	}
+	return []ent.Edge{}
 }
 
 func (User) Mixin() []ent.Mixin {

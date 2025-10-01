@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -31,26 +30,8 @@ const (
 	FieldPassword = "password"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
-	// EdgePrograms holds the string denoting the programs edge name in mutations.
-	EdgePrograms = "programs"
-	// EdgeWorkouts holds the string denoting the workouts edge name in mutations.
-	EdgeWorkouts = "workouts"
 	// Table holds the table name of the user in the database.
 	Table = "users"
-	// ProgramsTable is the table that holds the programs relation/edge.
-	ProgramsTable = "programs"
-	// ProgramsInverseTable is the table name for the Program entity.
-	// It exists in this package in order to avoid circular dependency with the "program" package.
-	ProgramsInverseTable = "programs"
-	// ProgramsColumn is the table column denoting the programs relation/edge.
-	ProgramsColumn = "user_id"
-	// WorkoutsTable is the table that holds the workouts relation/edge.
-	WorkoutsTable = "workouts"
-	// WorkoutsInverseTable is the table name for the Workout entity.
-	// It exists in this package in order to avoid circular dependency with the "workout" package.
-	WorkoutsInverseTable = "workouts"
-	// WorkoutsColumn is the table column denoting the workouts relation/edge.
-	WorkoutsColumn = "user_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -145,46 +126,4 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
-}
-
-// ByProgramsCount orders the results by programs count.
-func ByProgramsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newProgramsStep(), opts...)
-	}
-}
-
-// ByPrograms orders the results by programs terms.
-func ByPrograms(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newProgramsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-
-// ByWorkoutsCount orders the results by workouts count.
-func ByWorkoutsCount(opts ...sql.OrderTermOption) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborsCount(s, newWorkoutsStep(), opts...)
-	}
-}
-
-// ByWorkouts orders the results by workouts terms.
-func ByWorkouts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
-	return func(s *sql.Selector) {
-		sqlgraph.OrderByNeighborTerms(s, newWorkoutsStep(), append([]sql.OrderTerm{term}, terms...)...)
-	}
-}
-func newProgramsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(ProgramsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, ProgramsTable, ProgramsColumn),
-	)
-}
-func newWorkoutsStep() *sqlgraph.Step {
-	return sqlgraph.NewStep(
-		sqlgraph.From(Table, FieldID),
-		sqlgraph.To(WorkoutsInverseTable, FieldID),
-		sqlgraph.Edge(sqlgraph.O2M, false, WorkoutsTable, WorkoutsColumn),
-	)
 }

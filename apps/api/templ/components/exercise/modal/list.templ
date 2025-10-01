@@ -1,0 +1,21 @@
+package modal
+
+import "GoNext/base/internal/core/domain"
+
+templ List(exercises []*domain.Exercise){
+<div class="overflow-x-auto">
+    <table class="table">
+        <!-- head -->
+        <thead>
+            <tr>
+                <th>Name</th>
+            </tr>
+        </thead>
+        <tbody>
+            for _, v := range exercises {
+                @Exercise(v.Name)
+            }
+        </tbody>
+    </table>
+</div>
+}

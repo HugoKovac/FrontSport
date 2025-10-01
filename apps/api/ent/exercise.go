@@ -4,8 +4,6 @@ package ent
 
 import (
 	"GoNext/base/ent/exercise"
-	"GoNext/base/ent/program"
-	"GoNext/base/ent/workout"
 	"fmt"
 	"strings"
 	"time"
@@ -23,49 +21,13 @@ type Exercise struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
-	// Name holds the value of the "Name" field.
-	Name string `json:"Name,omitempty"`
-	// URL holds the value of the "url" field.
-	URL string `json:"url,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the ExerciseQuery when eager-loading is set.
-	Edges             ExerciseEdges `json:"edges"`
-	program_exercises *int
-	workout_exercises *int
-	selectValues      sql.SelectValues
-}
-
-// ExerciseEdges holds the relations/edges for other nodes in the graph.
-type ExerciseEdges struct {
-	// Programs holds the value of the programs edge.
-	Programs *Program `json:"programs,omitempty"`
-	// Workouts holds the value of the workouts edge.
-	Workouts *Workout `json:"workouts,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// ProgramsOrErr returns the Programs value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ExerciseEdges) ProgramsOrErr() (*Program, error) {
-	if e.Programs != nil {
-		return e.Programs, nil
-	} else if e.loadedTypes[0] {
-		return nil, &NotFoundError{label: program.Label}
-	}
-	return nil, &NotLoadedError{edge: "programs"}
-}
-
-// WorkoutsOrErr returns the Workouts value or an error if the edge
-// was not loaded in eager-loading, or loaded but was not found.
-func (e ExerciseEdges) WorkoutsOrErr() (*Workout, error) {
-	if e.Workouts != nil {
-		return e.Workouts, nil
-	} else if e.loadedTypes[1] {
-		return nil, &NotFoundError{label: workout.Label}
-	}
-	return nil, &NotLoadedError{edge: "workouts"}
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// VideoURL holds the value of the "video_url" field.
+	VideoURL string `json:"video_url,omitempty"`
+	// ImageURL holds the value of the "image_url" field.
+	ImageURL     string `json:"image_url,omitempty"`
+	selectValues sql.SelectValues
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -75,14 +37,10 @@ func (*Exercise) scanValues(columns []string) ([]any, error) {
 		switch columns[i] {
 		case exercise.FieldID:
 			values[i] = new(sql.NullInt64)
-		case exercise.FieldName, exercise.FieldURL:
+		case exercise.FieldName, exercise.FieldVideoURL, exercise.FieldImageURL:
 			values[i] = new(sql.NullString)
 		case exercise.FieldCreatedAt, exercise.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case exercise.ForeignKeys[0]: // program_exercises
-			values[i] = new(sql.NullInt64)
-		case exercise.ForeignKeys[1]: // workout_exercises
-			values[i] = new(sql.NullInt64)
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -118,29 +76,21 @@ func (e *Exercise) assignValues(columns []string, values []any) error {
 			}
 		case exercise.FieldName:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field Name", values[i])
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
 				e.Name = value.String
 			}
-		case exercise.FieldURL:
+		case exercise.FieldVideoURL:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field url", values[i])
+				return fmt.Errorf("unexpected type %T for field video_url", values[i])
 			} else if value.Valid {
-				e.URL = value.String
+				e.VideoURL = value.String
 			}
-		case exercise.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field program_exercises", value)
+		case exercise.FieldImageURL:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field image_url", values[i])
 			} else if value.Valid {
-				e.program_exercises = new(int)
-				*e.program_exercises = int(value.Int64)
-			}
-		case exercise.ForeignKeys[1]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field workout_exercises", value)
-			} else if value.Valid {
-				e.workout_exercises = new(int)
-				*e.workout_exercises = int(value.Int64)
+				e.ImageURL = value.String
 			}
 		default:
 			e.selectValues.Set(columns[i], values[i])
@@ -153,16 +103,6 @@ func (e *Exercise) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Exercise) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
-}
-
-// QueryPrograms queries the "programs" edge of the Exercise entity.
-func (e *Exercise) QueryPrograms() *ProgramQuery {
-	return NewExerciseClient(e.config).QueryPrograms(e)
-}
-
-// QueryWorkouts queries the "workouts" edge of the Exercise entity.
-func (e *Exercise) QueryWorkouts() *WorkoutQuery {
-	return NewExerciseClient(e.config).QueryWorkouts(e)
 }
 
 // Update returns a builder for updating this Exercise.
@@ -194,11 +134,14 @@ func (e *Exercise) String() string {
 	builder.WriteString("updated_at=")
 	builder.WriteString(e.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", ")
-	builder.WriteString("Name=")
+	builder.WriteString("name=")
 	builder.WriteString(e.Name)
 	builder.WriteString(", ")
-	builder.WriteString("url=")
-	builder.WriteString(e.URL)
+	builder.WriteString("video_url=")
+	builder.WriteString(e.VideoURL)
+	builder.WriteString(", ")
+	builder.WriteString("image_url=")
+	builder.WriteString(e.ImageURL)
 	builder.WriteByte(')')
 	return builder.String()
 }

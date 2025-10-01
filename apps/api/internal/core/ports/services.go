@@ -14,3 +14,7 @@ type AuthService interface {
     Authenticate(username string, password string) (string, error)
     ValidateToken(tokenString string) (string, error)
 }
+
+type ExerciseService interface {
+	GetExercises() ([]*domain.Exercise, error)
+}

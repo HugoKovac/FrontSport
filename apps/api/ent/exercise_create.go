@@ -4,8 +4,6 @@ package ent
 
 import (
 	"GoNext/base/ent/exercise"
-	"GoNext/base/ent/program"
-	"GoNext/base/ent/workout"
 	"context"
 	"errors"
 	"fmt"
@@ -50,54 +48,38 @@ func (ec *ExerciseCreate) SetNillableUpdatedAt(t *time.Time) *ExerciseCreate {
 	return ec
 }
 
-// SetName sets the "Name" field.
+// SetName sets the "name" field.
 func (ec *ExerciseCreate) SetName(s string) *ExerciseCreate {
 	ec.mutation.SetName(s)
 	return ec
 }
 
-// SetURL sets the "url" field.
-func (ec *ExerciseCreate) SetURL(s string) *ExerciseCreate {
-	ec.mutation.SetURL(s)
+// SetVideoURL sets the "video_url" field.
+func (ec *ExerciseCreate) SetVideoURL(s string) *ExerciseCreate {
+	ec.mutation.SetVideoURL(s)
 	return ec
 }
 
-// SetProgramsID sets the "programs" edge to the Program entity by ID.
-func (ec *ExerciseCreate) SetProgramsID(id int) *ExerciseCreate {
-	ec.mutation.SetProgramsID(id)
-	return ec
-}
-
-// SetNillableProgramsID sets the "programs" edge to the Program entity by ID if the given value is not nil.
-func (ec *ExerciseCreate) SetNillableProgramsID(id *int) *ExerciseCreate {
-	if id != nil {
-		ec = ec.SetProgramsID(*id)
+// SetNillableVideoURL sets the "video_url" field if the given value is not nil.
+func (ec *ExerciseCreate) SetNillableVideoURL(s *string) *ExerciseCreate {
+	if s != nil {
+		ec.SetVideoURL(*s)
 	}
 	return ec
 }
 
-// SetPrograms sets the "programs" edge to the Program entity.
-func (ec *ExerciseCreate) SetPrograms(p *Program) *ExerciseCreate {
-	return ec.SetProgramsID(p.ID)
-}
-
-// SetWorkoutsID sets the "workouts" edge to the Workout entity by ID.
-func (ec *ExerciseCreate) SetWorkoutsID(id int) *ExerciseCreate {
-	ec.mutation.SetWorkoutsID(id)
+// SetImageURL sets the "image_url" field.
+func (ec *ExerciseCreate) SetImageURL(s string) *ExerciseCreate {
+	ec.mutation.SetImageURL(s)
 	return ec
 }
 
-// SetNillableWorkoutsID sets the "workouts" edge to the Workout entity by ID if the given value is not nil.
-func (ec *ExerciseCreate) SetNillableWorkoutsID(id *int) *ExerciseCreate {
-	if id != nil {
-		ec = ec.SetWorkoutsID(*id)
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (ec *ExerciseCreate) SetNillableImageURL(s *string) *ExerciseCreate {
+	if s != nil {
+		ec.SetImageURL(*s)
 	}
 	return ec
-}
-
-// SetWorkouts sets the "workouts" edge to the Workout entity.
-func (ec *ExerciseCreate) SetWorkouts(w *Workout) *ExerciseCreate {
-	return ec.SetWorkoutsID(w.ID)
 }
 
 // Mutation returns the ExerciseMutation object of the builder.
@@ -154,14 +136,16 @@ func (ec *ExerciseCreate) check() error {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Exercise.updated_at"`)}
 	}
 	if _, ok := ec.mutation.Name(); !ok {
-		return &ValidationError{Name: "Name", err: errors.New(`ent: missing required field "Exercise.Name"`)}
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Exercise.name"`)}
 	}
-	if _, ok := ec.mutation.URL(); !ok {
-		return &ValidationError{Name: "url", err: errors.New(`ent: missing required field "Exercise.url"`)}
+	if v, ok := ec.mutation.VideoURL(); ok {
+		if err := exercise.VideoURLValidator(v); err != nil {
+			return &ValidationError{Name: "video_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.video_url": %w`, err)}
+		}
 	}
-	if v, ok := ec.mutation.URL(); ok {
-		if err := exercise.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Exercise.url": %w`, err)}
+	if v, ok := ec.mutation.ImageURL(); ok {
+		if err := exercise.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.image_url": %w`, err)}
 		}
 	}
 	return nil
@@ -202,43 +186,13 @@ func (ec *ExerciseCreate) createSpec() (*Exercise, *sqlgraph.CreateSpec) {
 		_spec.SetField(exercise.FieldName, field.TypeString, value)
 		_node.Name = value
 	}
-	if value, ok := ec.mutation.URL(); ok {
-		_spec.SetField(exercise.FieldURL, field.TypeString, value)
-		_node.URL = value
+	if value, ok := ec.mutation.VideoURL(); ok {
+		_spec.SetField(exercise.FieldVideoURL, field.TypeString, value)
+		_node.VideoURL = value
 	}
-	if nodes := ec.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.ProgramsTable,
-			Columns: []string{exercise.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.program_exercises = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := ec.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.WorkoutsTable,
-			Columns: []string{exercise.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_node.workout_exercises = &nodes[0]
-		_spec.Edges = append(_spec.Edges, edge)
+	if value, ok := ec.mutation.ImageURL(); ok {
+		_spec.SetField(exercise.FieldImageURL, field.TypeString, value)
+		_node.ImageURL = value
 	}
 	return _node, _spec
 }

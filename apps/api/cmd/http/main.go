@@ -30,6 +30,7 @@ func main() {
 	defer entClient.Close()
 
 	userRepo := repositories.NewUserRepository(entClient)
+	exerciseRepo := repositories.NewExerciseRepository(entClient)
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
@@ -39,7 +40,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	handlers.InitHandlers(app, userRepo, config)
+	handlers.InitHandlers(app, userRepo, exerciseRepo, config)
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

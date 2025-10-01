@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
-	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -475,52 +474,6 @@ func RoleNotIn(vs ...userprimitive.Roles) predicate.User {
 		v[i] = vs[i]
 	}
 	return predicate.User(sql.FieldNotIn(FieldRole, v...))
-}
-
-// HasPrograms applies the HasEdge predicate on the "programs" edge.
-func HasPrograms() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, ProgramsTable, ProgramsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasProgramsWith applies the HasEdge predicate on the "programs" edge with a given conditions (other predicates).
-func HasProgramsWith(preds ...predicate.Program) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newProgramsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
-}
-
-// HasWorkouts applies the HasEdge predicate on the "workouts" edge.
-func HasWorkouts() predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := sqlgraph.NewStep(
-			sqlgraph.From(Table, FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, WorkoutsTable, WorkoutsColumn),
-		)
-		sqlgraph.HasNeighbors(s, step)
-	})
-}
-
-// HasWorkoutsWith applies the HasEdge predicate on the "workouts" edge with a given conditions (other predicates).
-func HasWorkoutsWith(preds ...predicate.Workout) predicate.User {
-	return predicate.User(func(s *sql.Selector) {
-		step := newWorkoutsStep()
-		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
-			for _, p := range preds {
-				p(s)
-			}
-		})
-	})
 }
 
 // And groups predicates with the AND operator between them.

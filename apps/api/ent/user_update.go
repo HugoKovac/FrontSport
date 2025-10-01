@@ -4,9 +4,7 @@ package ent
 
 import (
 	"GoNext/base/ent/predicate"
-	"GoNext/base/ent/program"
 	"GoNext/base/ent/user"
-	"GoNext/base/ent/workout"
 	"GoNext/base/internal/primitive/userprimitive"
 	"context"
 	"errors"
@@ -119,81 +117,9 @@ func (uu *UserUpdate) SetNillableRole(u *userprimitive.Roles) *UserUpdate {
 	return uu
 }
 
-// AddProgramIDs adds the "programs" edge to the Program entity by IDs.
-func (uu *UserUpdate) AddProgramIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddProgramIDs(ids...)
-	return uu
-}
-
-// AddPrograms adds the "programs" edges to the Program entity.
-func (uu *UserUpdate) AddPrograms(p ...*Program) *UserUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uu.AddProgramIDs(ids...)
-}
-
-// AddWorkoutIDs adds the "workouts" edge to the Workout entity by IDs.
-func (uu *UserUpdate) AddWorkoutIDs(ids ...int) *UserUpdate {
-	uu.mutation.AddWorkoutIDs(ids...)
-	return uu
-}
-
-// AddWorkouts adds the "workouts" edges to the Workout entity.
-func (uu *UserUpdate) AddWorkouts(w ...*Workout) *UserUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return uu.AddWorkoutIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
-}
-
-// ClearPrograms clears all "programs" edges to the Program entity.
-func (uu *UserUpdate) ClearPrograms() *UserUpdate {
-	uu.mutation.ClearPrograms()
-	return uu
-}
-
-// RemoveProgramIDs removes the "programs" edge to Program entities by IDs.
-func (uu *UserUpdate) RemoveProgramIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveProgramIDs(ids...)
-	return uu
-}
-
-// RemovePrograms removes "programs" edges to Program entities.
-func (uu *UserUpdate) RemovePrograms(p ...*Program) *UserUpdate {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uu.RemoveProgramIDs(ids...)
-}
-
-// ClearWorkouts clears all "workouts" edges to the Workout entity.
-func (uu *UserUpdate) ClearWorkouts() *UserUpdate {
-	uu.mutation.ClearWorkouts()
-	return uu
-}
-
-// RemoveWorkoutIDs removes the "workouts" edge to Workout entities by IDs.
-func (uu *UserUpdate) RemoveWorkoutIDs(ids ...int) *UserUpdate {
-	uu.mutation.RemoveWorkoutIDs(ids...)
-	return uu
-}
-
-// RemoveWorkouts removes "workouts" edges to Workout entities.
-func (uu *UserUpdate) RemoveWorkouts(w ...*Workout) *UserUpdate {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return uu.RemoveWorkoutIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -292,96 +218,6 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := uu.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
-	}
-	if uu.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedProgramsIDs(); len(nodes) > 0 && !uu.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uu.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.RemovedWorkoutsIDs(); len(nodes) > 0 && !uu.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uu.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -491,81 +327,9 @@ func (uuo *UserUpdateOne) SetNillableRole(u *userprimitive.Roles) *UserUpdateOne
 	return uuo
 }
 
-// AddProgramIDs adds the "programs" edge to the Program entity by IDs.
-func (uuo *UserUpdateOne) AddProgramIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddProgramIDs(ids...)
-	return uuo
-}
-
-// AddPrograms adds the "programs" edges to the Program entity.
-func (uuo *UserUpdateOne) AddPrograms(p ...*Program) *UserUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uuo.AddProgramIDs(ids...)
-}
-
-// AddWorkoutIDs adds the "workouts" edge to the Workout entity by IDs.
-func (uuo *UserUpdateOne) AddWorkoutIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.AddWorkoutIDs(ids...)
-	return uuo
-}
-
-// AddWorkouts adds the "workouts" edges to the Workout entity.
-func (uuo *UserUpdateOne) AddWorkouts(w ...*Workout) *UserUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return uuo.AddWorkoutIDs(ids...)
-}
-
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
-}
-
-// ClearPrograms clears all "programs" edges to the Program entity.
-func (uuo *UserUpdateOne) ClearPrograms() *UserUpdateOne {
-	uuo.mutation.ClearPrograms()
-	return uuo
-}
-
-// RemoveProgramIDs removes the "programs" edge to Program entities by IDs.
-func (uuo *UserUpdateOne) RemoveProgramIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveProgramIDs(ids...)
-	return uuo
-}
-
-// RemovePrograms removes "programs" edges to Program entities.
-func (uuo *UserUpdateOne) RemovePrograms(p ...*Program) *UserUpdateOne {
-	ids := make([]int, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uuo.RemoveProgramIDs(ids...)
-}
-
-// ClearWorkouts clears all "workouts" edges to the Workout entity.
-func (uuo *UserUpdateOne) ClearWorkouts() *UserUpdateOne {
-	uuo.mutation.ClearWorkouts()
-	return uuo
-}
-
-// RemoveWorkoutIDs removes the "workouts" edge to Workout entities by IDs.
-func (uuo *UserUpdateOne) RemoveWorkoutIDs(ids ...int) *UserUpdateOne {
-	uuo.mutation.RemoveWorkoutIDs(ids...)
-	return uuo
-}
-
-// RemoveWorkouts removes "workouts" edges to Workout entities.
-func (uuo *UserUpdateOne) RemoveWorkouts(w ...*Workout) *UserUpdateOne {
-	ids := make([]int, len(w))
-	for i := range w {
-		ids[i] = w[i].ID
-	}
-	return uuo.RemoveWorkoutIDs(ids...)
 }
 
 // Where appends a list predicates to the UserUpdate builder.
@@ -694,96 +458,6 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 	}
 	if value, ok := uuo.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
-	}
-	if uuo.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedProgramsIDs(); len(nodes) > 0 && !uuo.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.ProgramsTable,
-			Columns: []string{user.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
-	}
-	if uuo.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.RemovedWorkoutsIDs(); len(nodes) > 0 && !uuo.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := uuo.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.WorkoutsTable,
-			Columns: []string{user.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

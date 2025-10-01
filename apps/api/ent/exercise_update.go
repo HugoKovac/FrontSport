@@ -5,8 +5,6 @@ package ent
 import (
 	"GoNext/base/ent/exercise"
 	"GoNext/base/ent/predicate"
-	"GoNext/base/ent/program"
-	"GoNext/base/ent/workout"
 	"context"
 	"errors"
 	"fmt"
@@ -36,13 +34,13 @@ func (eu *ExerciseUpdate) SetUpdatedAt(t time.Time) *ExerciseUpdate {
 	return eu
 }
 
-// SetName sets the "Name" field.
+// SetName sets the "name" field.
 func (eu *ExerciseUpdate) SetName(s string) *ExerciseUpdate {
 	eu.mutation.SetName(s)
 	return eu
 }
 
-// SetNillableName sets the "Name" field if the given value is not nil.
+// SetNillableName sets the "name" field if the given value is not nil.
 func (eu *ExerciseUpdate) SetNillableName(s *string) *ExerciseUpdate {
 	if s != nil {
 		eu.SetName(*s)
@@ -50,73 +48,49 @@ func (eu *ExerciseUpdate) SetNillableName(s *string) *ExerciseUpdate {
 	return eu
 }
 
-// SetURL sets the "url" field.
-func (eu *ExerciseUpdate) SetURL(s string) *ExerciseUpdate {
-	eu.mutation.SetURL(s)
+// SetVideoURL sets the "video_url" field.
+func (eu *ExerciseUpdate) SetVideoURL(s string) *ExerciseUpdate {
+	eu.mutation.SetVideoURL(s)
 	return eu
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (eu *ExerciseUpdate) SetNillableURL(s *string) *ExerciseUpdate {
+// SetNillableVideoURL sets the "video_url" field if the given value is not nil.
+func (eu *ExerciseUpdate) SetNillableVideoURL(s *string) *ExerciseUpdate {
 	if s != nil {
-		eu.SetURL(*s)
+		eu.SetVideoURL(*s)
 	}
 	return eu
 }
 
-// SetProgramsID sets the "programs" edge to the Program entity by ID.
-func (eu *ExerciseUpdate) SetProgramsID(id int) *ExerciseUpdate {
-	eu.mutation.SetProgramsID(id)
+// ClearVideoURL clears the value of the "video_url" field.
+func (eu *ExerciseUpdate) ClearVideoURL() *ExerciseUpdate {
+	eu.mutation.ClearVideoURL()
 	return eu
 }
 
-// SetNillableProgramsID sets the "programs" edge to the Program entity by ID if the given value is not nil.
-func (eu *ExerciseUpdate) SetNillableProgramsID(id *int) *ExerciseUpdate {
-	if id != nil {
-		eu = eu.SetProgramsID(*id)
+// SetImageURL sets the "image_url" field.
+func (eu *ExerciseUpdate) SetImageURL(s string) *ExerciseUpdate {
+	eu.mutation.SetImageURL(s)
+	return eu
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (eu *ExerciseUpdate) SetNillableImageURL(s *string) *ExerciseUpdate {
+	if s != nil {
+		eu.SetImageURL(*s)
 	}
 	return eu
 }
 
-// SetPrograms sets the "programs" edge to the Program entity.
-func (eu *ExerciseUpdate) SetPrograms(p *Program) *ExerciseUpdate {
-	return eu.SetProgramsID(p.ID)
-}
-
-// SetWorkoutsID sets the "workouts" edge to the Workout entity by ID.
-func (eu *ExerciseUpdate) SetWorkoutsID(id int) *ExerciseUpdate {
-	eu.mutation.SetWorkoutsID(id)
+// ClearImageURL clears the value of the "image_url" field.
+func (eu *ExerciseUpdate) ClearImageURL() *ExerciseUpdate {
+	eu.mutation.ClearImageURL()
 	return eu
-}
-
-// SetNillableWorkoutsID sets the "workouts" edge to the Workout entity by ID if the given value is not nil.
-func (eu *ExerciseUpdate) SetNillableWorkoutsID(id *int) *ExerciseUpdate {
-	if id != nil {
-		eu = eu.SetWorkoutsID(*id)
-	}
-	return eu
-}
-
-// SetWorkouts sets the "workouts" edge to the Workout entity.
-func (eu *ExerciseUpdate) SetWorkouts(w *Workout) *ExerciseUpdate {
-	return eu.SetWorkoutsID(w.ID)
 }
 
 // Mutation returns the ExerciseMutation object of the builder.
 func (eu *ExerciseUpdate) Mutation() *ExerciseMutation {
 	return eu.mutation
-}
-
-// ClearPrograms clears the "programs" edge to the Program entity.
-func (eu *ExerciseUpdate) ClearPrograms() *ExerciseUpdate {
-	eu.mutation.ClearPrograms()
-	return eu
-}
-
-// ClearWorkouts clears the "workouts" edge to the Workout entity.
-func (eu *ExerciseUpdate) ClearWorkouts() *ExerciseUpdate {
-	eu.mutation.ClearWorkouts()
-	return eu
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -157,9 +131,14 @@ func (eu *ExerciseUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (eu *ExerciseUpdate) check() error {
-	if v, ok := eu.mutation.URL(); ok {
-		if err := exercise.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Exercise.url": %w`, err)}
+	if v, ok := eu.mutation.VideoURL(); ok {
+		if err := exercise.VideoURLValidator(v); err != nil {
+			return &ValidationError{Name: "video_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.video_url": %w`, err)}
+		}
+	}
+	if v, ok := eu.mutation.ImageURL(); ok {
+		if err := exercise.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.image_url": %w`, err)}
 		}
 	}
 	return nil
@@ -183,66 +162,17 @@ func (eu *ExerciseUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	if value, ok := eu.mutation.Name(); ok {
 		_spec.SetField(exercise.FieldName, field.TypeString, value)
 	}
-	if value, ok := eu.mutation.URL(); ok {
-		_spec.SetField(exercise.FieldURL, field.TypeString, value)
+	if value, ok := eu.mutation.VideoURL(); ok {
+		_spec.SetField(exercise.FieldVideoURL, field.TypeString, value)
 	}
-	if eu.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.ProgramsTable,
-			Columns: []string{exercise.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if eu.mutation.VideoURLCleared() {
+		_spec.ClearField(exercise.FieldVideoURL, field.TypeString)
 	}
-	if nodes := eu.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.ProgramsTable,
-			Columns: []string{exercise.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := eu.mutation.ImageURL(); ok {
+		_spec.SetField(exercise.FieldImageURL, field.TypeString, value)
 	}
-	if eu.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.WorkoutsTable,
-			Columns: []string{exercise.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := eu.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.WorkoutsTable,
-			Columns: []string{exercise.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if eu.mutation.ImageURLCleared() {
+		_spec.ClearField(exercise.FieldImageURL, field.TypeString)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, eu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -270,13 +200,13 @@ func (euo *ExerciseUpdateOne) SetUpdatedAt(t time.Time) *ExerciseUpdateOne {
 	return euo
 }
 
-// SetName sets the "Name" field.
+// SetName sets the "name" field.
 func (euo *ExerciseUpdateOne) SetName(s string) *ExerciseUpdateOne {
 	euo.mutation.SetName(s)
 	return euo
 }
 
-// SetNillableName sets the "Name" field if the given value is not nil.
+// SetNillableName sets the "name" field if the given value is not nil.
 func (euo *ExerciseUpdateOne) SetNillableName(s *string) *ExerciseUpdateOne {
 	if s != nil {
 		euo.SetName(*s)
@@ -284,73 +214,49 @@ func (euo *ExerciseUpdateOne) SetNillableName(s *string) *ExerciseUpdateOne {
 	return euo
 }
 
-// SetURL sets the "url" field.
-func (euo *ExerciseUpdateOne) SetURL(s string) *ExerciseUpdateOne {
-	euo.mutation.SetURL(s)
+// SetVideoURL sets the "video_url" field.
+func (euo *ExerciseUpdateOne) SetVideoURL(s string) *ExerciseUpdateOne {
+	euo.mutation.SetVideoURL(s)
 	return euo
 }
 
-// SetNillableURL sets the "url" field if the given value is not nil.
-func (euo *ExerciseUpdateOne) SetNillableURL(s *string) *ExerciseUpdateOne {
+// SetNillableVideoURL sets the "video_url" field if the given value is not nil.
+func (euo *ExerciseUpdateOne) SetNillableVideoURL(s *string) *ExerciseUpdateOne {
 	if s != nil {
-		euo.SetURL(*s)
+		euo.SetVideoURL(*s)
 	}
 	return euo
 }
 
-// SetProgramsID sets the "programs" edge to the Program entity by ID.
-func (euo *ExerciseUpdateOne) SetProgramsID(id int) *ExerciseUpdateOne {
-	euo.mutation.SetProgramsID(id)
+// ClearVideoURL clears the value of the "video_url" field.
+func (euo *ExerciseUpdateOne) ClearVideoURL() *ExerciseUpdateOne {
+	euo.mutation.ClearVideoURL()
 	return euo
 }
 
-// SetNillableProgramsID sets the "programs" edge to the Program entity by ID if the given value is not nil.
-func (euo *ExerciseUpdateOne) SetNillableProgramsID(id *int) *ExerciseUpdateOne {
-	if id != nil {
-		euo = euo.SetProgramsID(*id)
+// SetImageURL sets the "image_url" field.
+func (euo *ExerciseUpdateOne) SetImageURL(s string) *ExerciseUpdateOne {
+	euo.mutation.SetImageURL(s)
+	return euo
+}
+
+// SetNillableImageURL sets the "image_url" field if the given value is not nil.
+func (euo *ExerciseUpdateOne) SetNillableImageURL(s *string) *ExerciseUpdateOne {
+	if s != nil {
+		euo.SetImageURL(*s)
 	}
 	return euo
 }
 
-// SetPrograms sets the "programs" edge to the Program entity.
-func (euo *ExerciseUpdateOne) SetPrograms(p *Program) *ExerciseUpdateOne {
-	return euo.SetProgramsID(p.ID)
-}
-
-// SetWorkoutsID sets the "workouts" edge to the Workout entity by ID.
-func (euo *ExerciseUpdateOne) SetWorkoutsID(id int) *ExerciseUpdateOne {
-	euo.mutation.SetWorkoutsID(id)
+// ClearImageURL clears the value of the "image_url" field.
+func (euo *ExerciseUpdateOne) ClearImageURL() *ExerciseUpdateOne {
+	euo.mutation.ClearImageURL()
 	return euo
-}
-
-// SetNillableWorkoutsID sets the "workouts" edge to the Workout entity by ID if the given value is not nil.
-func (euo *ExerciseUpdateOne) SetNillableWorkoutsID(id *int) *ExerciseUpdateOne {
-	if id != nil {
-		euo = euo.SetWorkoutsID(*id)
-	}
-	return euo
-}
-
-// SetWorkouts sets the "workouts" edge to the Workout entity.
-func (euo *ExerciseUpdateOne) SetWorkouts(w *Workout) *ExerciseUpdateOne {
-	return euo.SetWorkoutsID(w.ID)
 }
 
 // Mutation returns the ExerciseMutation object of the builder.
 func (euo *ExerciseUpdateOne) Mutation() *ExerciseMutation {
 	return euo.mutation
-}
-
-// ClearPrograms clears the "programs" edge to the Program entity.
-func (euo *ExerciseUpdateOne) ClearPrograms() *ExerciseUpdateOne {
-	euo.mutation.ClearPrograms()
-	return euo
-}
-
-// ClearWorkouts clears the "workouts" edge to the Workout entity.
-func (euo *ExerciseUpdateOne) ClearWorkouts() *ExerciseUpdateOne {
-	euo.mutation.ClearWorkouts()
-	return euo
 }
 
 // Where appends a list predicates to the ExerciseUpdate builder.
@@ -404,9 +310,14 @@ func (euo *ExerciseUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (euo *ExerciseUpdateOne) check() error {
-	if v, ok := euo.mutation.URL(); ok {
-		if err := exercise.URLValidator(v); err != nil {
-			return &ValidationError{Name: "url", err: fmt.Errorf(`ent: validator failed for field "Exercise.url": %w`, err)}
+	if v, ok := euo.mutation.VideoURL(); ok {
+		if err := exercise.VideoURLValidator(v); err != nil {
+			return &ValidationError{Name: "video_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.video_url": %w`, err)}
+		}
+	}
+	if v, ok := euo.mutation.ImageURL(); ok {
+		if err := exercise.ImageURLValidator(v); err != nil {
+			return &ValidationError{Name: "image_url", err: fmt.Errorf(`ent: validator failed for field "Exercise.image_url": %w`, err)}
 		}
 	}
 	return nil
@@ -447,66 +358,17 @@ func (euo *ExerciseUpdateOne) sqlSave(ctx context.Context) (_node *Exercise, err
 	if value, ok := euo.mutation.Name(); ok {
 		_spec.SetField(exercise.FieldName, field.TypeString, value)
 	}
-	if value, ok := euo.mutation.URL(); ok {
-		_spec.SetField(exercise.FieldURL, field.TypeString, value)
+	if value, ok := euo.mutation.VideoURL(); ok {
+		_spec.SetField(exercise.FieldVideoURL, field.TypeString, value)
 	}
-	if euo.mutation.ProgramsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.ProgramsTable,
-			Columns: []string{exercise.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	if euo.mutation.VideoURLCleared() {
+		_spec.ClearField(exercise.FieldVideoURL, field.TypeString)
 	}
-	if nodes := euo.mutation.ProgramsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.ProgramsTable,
-			Columns: []string{exercise.ProgramsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(program.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if value, ok := euo.mutation.ImageURL(); ok {
+		_spec.SetField(exercise.FieldImageURL, field.TypeString, value)
 	}
-	if euo.mutation.WorkoutsCleared() {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.WorkoutsTable,
-			Columns: []string{exercise.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
-	}
-	if nodes := euo.mutation.WorkoutsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2O,
-			Inverse: true,
-			Table:   exercise.WorkoutsTable,
-			Columns: []string{exercise.WorkoutsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeInt),
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	if euo.mutation.ImageURLCleared() {
+		_spec.ClearField(exercise.FieldImageURL, field.TypeString)
 	}
 	_node = &Exercise{config: euo.config}
 	_spec.Assign = _node.assignValues

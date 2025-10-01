@@ -3,12 +3,12 @@ package schema
 import (
 	"GoNext/base/ent/schema/mixin/timestamps"
 
+
 	"entgo.io/ent"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
-// Exercise holds the schema definition for the Exercise entity.
+// User holds the schema definition for the User entity.
 type Exercise struct {
 	ent.Schema
 }
@@ -16,17 +16,15 @@ type Exercise struct {
 // Fields of the Exercise.
 func (Exercise) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("Name"),
-		field.String("url").MaxLen(2048),
+		field.String("name"),
+		field.String("video_url").Optional().MaxLen(256),
+		field.String("image_url").Optional().MaxLen(256),
 	}
 }
 
 // Edges of the Exercise.
 func (Exercise) Edges() []ent.Edge {
-    return []ent.Edge{
-        edge.From("programs", Program.Type).Ref("exercises").Unique(),
-        edge.From("workouts", Workout.Type).Ref("exercises").Unique(),
-    }
+	return []ent.Edge{}
 }
 
 func (Exercise) Mixin() []ent.Mixin {

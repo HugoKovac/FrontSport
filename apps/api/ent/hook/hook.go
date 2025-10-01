@@ -20,18 +20,6 @@ func (f ExerciseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, er
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ExerciseMutation", m)
 }
 
-// The ProgramFunc type is an adapter to allow the use of ordinary
-// function as Program mutator.
-type ProgramFunc func(context.Context, *ent.ProgramMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f ProgramFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.ProgramMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ProgramMutation", m)
-}
-
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)
@@ -42,18 +30,6 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 		return f(ctx, mv)
 	}
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
-}
-
-// The WorkoutFunc type is an adapter to allow the use of ordinary
-// function as Workout mutator.
-type WorkoutFunc func(context.Context, *ent.WorkoutMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f WorkoutFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	if mv, ok := m.(*ent.WorkoutMutation); ok {
-		return f(ctx, mv)
-	}
-	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WorkoutMutation", m)
 }
 
 // Condition is a hook condition function.
