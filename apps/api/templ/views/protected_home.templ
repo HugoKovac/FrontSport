@@ -2,33 +2,38 @@ package views
 
 import (
     "GoNext/base/templ/layouts"
-    "GoNext/base/templ/components/exercise"
+	"GoNext/base/internal/core/domain"
 )
 
-templ ProtectedHome(name string) {
+templ ProtectedHome(name string, wrks []*domain.Workout) {
     @layouts.BaseLayout(){
-        <div class="flex flex-col items-center">
-            <div id="exercises">
-            @exercise.Card(-1, "Bench Press", exercise.Set(exercise.SetAttributes{
-                    Index: 1,
-                    PreviousWeight: 60,
-                    PreviousReps: 12,
-                }))
-            </div>
-            <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" onclick="my_modal_1.showModal()" hx-target="#modal_content" hx-trigger="click" hx-get="/exercise">Add Exercise</button>
-            // <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" hx-post="/exercise/add" hx-swap="beforeend" hx-target="#exercises" onclick="my_modal_1.showModal()">Add Exercise</button>
-            <dialog id="my_modal_1" class="modal">
-                <form class="modal-box" hx-post="/exercise/add">
-                    <h3 class="text-lg font-bold">Choose An Exercise</h3>
-                    <div id="modal_content" />
-                    <div class="modal-action">
-                    <form method="dialog">
-                        <button class="btn">Close</button>
-                        <button class="btn" type="submit" hx-target="#exercises" hx-post="/exercise/add" hx-swap="beforeend" hx-on::after-request="my_modal_1.close()">Add</button>
-                    </form>
-                    </div>
-                </form>
-            </dialog>
-        </div>
+        <h1 class="text-5xl font-bold">Workouts</h1>
+        <button class="btn" hx-post="/workout">New Workout</button>
+        for k, v := range wrks {
+            <a id={k} href={"/workout/" + v.Id}>{v.Id}</a>
+        }
+        // <div class="flex flex-col items-center">
+        //     <div id="exercises">
+        //     @exercise.Card(-1, "Bench Press", exercise.Set(exercise.SetAttributes{
+        //             Index: 1,
+        //             PreviousWeight: 60,
+        //             PreviousReps: 12,
+        //         }))
+        //     </div>
+        //     <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" onclick="my_modal_1.showModal()" hx-target="#modal_content" hx-trigger="click" hx-get="/exercise">Add Exercise</button>
+        //     // <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" hx-post="/exercise/add" hx-swap="beforeend" hx-target="#exercises" onclick="my_modal_1.showModal()">Add Exercise</button>
+        //     <dialog id="my_modal_1" class="modal">
+        //         <form class="modal-box" hx-post="/exercise/add">
+        //             <h3 class="text-lg font-bold">Choose An Exercise</h3>
+        //             <div id="modal_content" />
+        //             <div class="modal-action">
+        //             <form method="dialog">
+        //                 <button class="btn">Close</button>
+        //                 <button class="btn" type="submit" hx-target="#exercises" hx-post="/exercise/add" hx-swap="beforeend" hx-on::after-request="my_modal_1.close()">Add</button>
+        //             </form>
+        //             </div>
+        //         </form>
+        //     </dialog>
+        // </div>
     }
 }

@@ -40,12 +40,64 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// WorkoutsColumns holds the columns for the "workouts" table.
+	WorkoutsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_workouts", Type: field.TypeUUID, Nullable: true},
+	}
+	// WorkoutsTable holds the schema information for the "workouts" table.
+	WorkoutsTable = &schema.Table{
+		Name:       "workouts",
+		Columns:    WorkoutsColumns,
+		PrimaryKey: []*schema.Column{WorkoutsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "workouts_users_workouts",
+				Columns:    []*schema.Column{WorkoutsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
+	// WorkoutExercisesColumns holds the columns for the "workout_exercises" table.
+	WorkoutExercisesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "exercise_id", Type: field.TypeInt},
+		{Name: "workout_id", Type: field.TypeUUID},
+	}
+	// WorkoutExercisesTable holds the schema information for the "workout_exercises" table.
+	WorkoutExercisesTable = &schema.Table{
+		Name:       "workout_exercises",
+		Columns:    WorkoutExercisesColumns,
+		PrimaryKey: []*schema.Column{WorkoutExercisesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "workout_exercises_exercises_workout_exercise",
+				Columns:    []*schema.Column{WorkoutExercisesColumns[1]},
+				RefColumns: []*schema.Column{ExercisesColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+			{
+				Symbol:     "workout_exercises_workouts_workout_exercise",
+				Columns:    []*schema.Column{WorkoutExercisesColumns[2]},
+				RefColumns: []*schema.Column{WorkoutsColumns[0]},
+				OnDelete:   schema.NoAction,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		ExercisesTable,
 		UsersTable,
+		WorkoutsTable,
+		WorkoutExercisesTable,
 	}
 )
 
 func init() {
+	WorkoutsTable.ForeignKeys[0].RefTable = UsersTable
+	WorkoutExercisesTable.ForeignKeys[0].RefTable = ExercisesTable
+	WorkoutExercisesTable.ForeignKeys[1].RefTable = WorkoutsTable
 }

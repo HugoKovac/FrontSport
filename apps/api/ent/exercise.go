@@ -26,8 +26,29 @@ type Exercise struct {
 	// VideoURL holds the value of the "video_url" field.
 	VideoURL string `json:"video_url,omitempty"`
 	// ImageURL holds the value of the "image_url" field.
-	ImageURL     string `json:"image_url,omitempty"`
+	ImageURL string `json:"image_url,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the ExerciseQuery when eager-loading is set.
+	Edges        ExerciseEdges `json:"edges"`
 	selectValues sql.SelectValues
+}
+
+// ExerciseEdges holds the relations/edges for other nodes in the graph.
+type ExerciseEdges struct {
+	// WorkoutExercise holds the value of the workout_exercise edge.
+	WorkoutExercise []*WorkoutExercise `json:"workout_exercise,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [1]bool
+}
+
+// WorkoutExerciseOrErr returns the WorkoutExercise value or an error if the edge
+// was not loaded in eager-loading.
+func (e ExerciseEdges) WorkoutExerciseOrErr() ([]*WorkoutExercise, error) {
+	if e.loadedTypes[0] {
+		return e.WorkoutExercise, nil
+	}
+	return nil, &NotLoadedError{edge: "workout_exercise"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -103,6 +124,11 @@ func (e *Exercise) assignValues(columns []string, values []any) error {
 // This includes values selected through modifiers, order, etc.
 func (e *Exercise) Value(name string) (ent.Value, error) {
 	return e.selectValues.Get(name)
+}
+
+// QueryWorkoutExercise queries the "workout_exercise" edge of the Exercise entity.
+func (e *Exercise) QueryWorkoutExercise() *WorkoutExerciseQuery {
+	return NewExerciseClient(e.config).QueryWorkoutExercise(e)
 }
 
 // Update returns a builder for updating this Exercise.

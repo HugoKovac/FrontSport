@@ -32,6 +32,30 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
 }
 
+// The WorkoutFunc type is an adapter to allow the use of ordinary
+// function as Workout mutator.
+type WorkoutFunc func(context.Context, *ent.WorkoutMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WorkoutFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WorkoutMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WorkoutMutation", m)
+}
+
+// The WorkoutExerciseFunc type is an adapter to allow the use of ordinary
+// function as WorkoutExercise mutator.
+type WorkoutExerciseFunc func(context.Context, *ent.WorkoutExerciseMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f WorkoutExerciseFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	if mv, ok := m.(*ent.WorkoutExerciseMutation); ok {
+		return f(ctx, mv)
+	}
+	return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.WorkoutExerciseMutation", m)
+}
+
 // Condition is a hook condition function.
 type Condition func(context.Context, ent.Mutation) bool
 

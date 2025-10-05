@@ -4,6 +4,7 @@ package ent
 
 import (
 	"GoNext/base/ent/user"
+	"GoNext/base/ent/workout"
 	"GoNext/base/internal/primitive/userprimitive"
 	"context"
 	"errors"
@@ -116,6 +117,21 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
+}
+
+// AddWorkoutIDs adds the "workouts" edge to the Workout entity by IDs.
+func (uc *UserCreate) AddWorkoutIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddWorkoutIDs(ids...)
+	return uc
+}
+
+// AddWorkouts adds the "workouts" edges to the Workout entity.
+func (uc *UserCreate) AddWorkouts(w ...*Workout) *UserCreate {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return uc.AddWorkoutIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -270,6 +286,22 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 	if value, ok := uc.mutation.Role(); ok {
 		_spec.SetField(user.FieldRole, field.TypeEnum, value)
 		_node.Role = value
+	}
+	if nodes := uc.mutation.WorkoutsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.WorkoutsTable,
+			Columns: []string{user.WorkoutsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workout.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

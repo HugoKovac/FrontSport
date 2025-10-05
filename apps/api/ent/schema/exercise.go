@@ -3,8 +3,8 @@ package schema
 import (
 	"GoNext/base/ent/schema/mixin/timestamps"
 
-
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 )
 
@@ -24,7 +24,9 @@ func (Exercise) Fields() []ent.Field {
 
 // Edges of the Exercise.
 func (Exercise) Edges() []ent.Edge {
-	return []ent.Edge{}
+	return []ent.Edge{
+		edge.To("workout_exercise", WorkoutExercise.Type),
+	}
 }
 
 func (Exercise) Mixin() []ent.Mixin {

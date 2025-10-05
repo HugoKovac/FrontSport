@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 )
 
 // ID filters vertices based on their ID field.
@@ -372,6 +373,29 @@ func ImageURLEqualFold(v string) predicate.Exercise {
 // ImageURLContainsFold applies the ContainsFold predicate on the "image_url" field.
 func ImageURLContainsFold(v string) predicate.Exercise {
 	return predicate.Exercise(sql.FieldContainsFold(FieldImageURL, v))
+}
+
+// HasWorkoutExercise applies the HasEdge predicate on the "workout_exercise" edge.
+func HasWorkoutExercise() predicate.Exercise {
+	return predicate.Exercise(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, WorkoutExerciseTable, WorkoutExerciseColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasWorkoutExerciseWith applies the HasEdge predicate on the "workout_exercise" edge with a given conditions (other predicates).
+func HasWorkoutExerciseWith(preds ...predicate.WorkoutExercise) predicate.Exercise {
+	return predicate.Exercise(func(s *sql.Selector) {
+		step := newWorkoutExerciseStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
 }
 
 // And groups predicates with the AND operator between them.

@@ -2,6 +2,8 @@ package ports
 
 import (
 	"GoNext/base/internal/core/domain"
+
+	"github.com/google/uuid"
 )
 
 type UserRepository interface {
@@ -15,4 +17,10 @@ type UserRepository interface {
 type ExerciseRepository interface {
 	GetExercises() ([]*domain.Exercise, error)
 	GetExerciseById(id int) (*domain.Exercise, error)
+}
+
+type WorkoutRepository interface {
+	CreateWorkout(userId uuid.UUID) (*domain.Workout, error)
+	GetWorkoutsByUser(userId uuid.UUID) ([]*domain.Workout, error)
+	GetWorkoutById(id uuid.UUID) (*domain.Workout, error)
 }

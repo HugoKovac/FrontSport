@@ -1,6 +1,10 @@
 package ports
 
-import "GoNext/base/internal/core/domain"
+import (
+	"GoNext/base/internal/core/domain"
+
+	"github.com/google/uuid"
+)
 
 type UserService interface {
 	Register(user domain.User) (*domain.User, error)
@@ -18,4 +22,10 @@ type AuthService interface {
 type ExerciseService interface {
 	GetExercises() ([]*domain.Exercise, error)
 	GetExerciseById(id int) (*domain.Exercise, error)
+}
+
+type WorkoutService interface {
+	CreateWorkout(userId uuid.UUID) (*domain.Workout, error)
+	GetWorkoutsByUser(userId uuid.UUID) ([]*domain.Workout, error)
+	GetWorkoutById(id uuid.UUID) (*domain.Workout, error)
 }

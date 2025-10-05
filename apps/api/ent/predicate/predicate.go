@@ -11,3 +11,9 @@ type Exercise func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// Workout is the predicate function for workout builders.
+type Workout func(*sql.Selector)
+
+// WorkoutExercise is the predicate function for workoutexercise builders.
+type WorkoutExercise func(*sql.Selector)

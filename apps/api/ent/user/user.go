@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/google/uuid"
 )
 
@@ -30,8 +31,17 @@ const (
 	FieldPassword = "password"
 	// FieldRole holds the string denoting the role field in the database.
 	FieldRole = "role"
+	// EdgeWorkouts holds the string denoting the workouts edge name in mutations.
+	EdgeWorkouts = "workouts"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// WorkoutsTable is the table that holds the workouts relation/edge.
+	WorkoutsTable = "workouts"
+	// WorkoutsInverseTable is the table name for the Workout entity.
+	// It exists in this package in order to avoid circular dependency with the "workout" package.
+	WorkoutsInverseTable = "workouts"
+	// WorkoutsColumn is the table column denoting the workouts relation/edge.
+	WorkoutsColumn = "user_workouts"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -126,4 +136,25 @@ func ByPassword(opts ...sql.OrderTermOption) OrderOption {
 // ByRole orders the results by the role field.
 func ByRole(opts ...sql.OrderTermOption) OrderOption {
 	return sql.OrderByField(FieldRole, opts...).ToFunc()
+}
+
+// ByWorkoutsCount orders the results by workouts count.
+func ByWorkoutsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newWorkoutsStep(), opts...)
+	}
+}
+
+// ByWorkouts orders the results by workouts terms.
+func ByWorkouts(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newWorkoutsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
+func newWorkoutsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(WorkoutsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, WorkoutsTable, WorkoutsColumn),
+	)
 }

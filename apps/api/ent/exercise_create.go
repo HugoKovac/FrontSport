@@ -4,6 +4,7 @@ package ent
 
 import (
 	"GoNext/base/ent/exercise"
+	"GoNext/base/ent/workoutexercise"
 	"context"
 	"errors"
 	"fmt"
@@ -80,6 +81,21 @@ func (ec *ExerciseCreate) SetNillableImageURL(s *string) *ExerciseCreate {
 		ec.SetImageURL(*s)
 	}
 	return ec
+}
+
+// AddWorkoutExerciseIDs adds the "workout_exercise" edge to the WorkoutExercise entity by IDs.
+func (ec *ExerciseCreate) AddWorkoutExerciseIDs(ids ...int) *ExerciseCreate {
+	ec.mutation.AddWorkoutExerciseIDs(ids...)
+	return ec
+}
+
+// AddWorkoutExercise adds the "workout_exercise" edges to the WorkoutExercise entity.
+func (ec *ExerciseCreate) AddWorkoutExercise(w ...*WorkoutExercise) *ExerciseCreate {
+	ids := make([]int, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return ec.AddWorkoutExerciseIDs(ids...)
 }
 
 // Mutation returns the ExerciseMutation object of the builder.
@@ -193,6 +209,22 @@ func (ec *ExerciseCreate) createSpec() (*Exercise, *sqlgraph.CreateSpec) {
 	if value, ok := ec.mutation.ImageURL(); ok {
 		_spec.SetField(exercise.FieldImageURL, field.TypeString, value)
 		_node.ImageURL = value
+	}
+	if nodes := ec.mutation.WorkoutExerciseIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   exercise.WorkoutExerciseTable,
+			Columns: []string{exercise.WorkoutExerciseColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexercise.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
