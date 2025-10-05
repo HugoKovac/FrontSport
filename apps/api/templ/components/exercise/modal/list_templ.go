@@ -36,7 +36,7 @@ func List(exercises []*domain.Exercise) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		for _, v := range exercises {
-			templ_7745c5c3_Err = Exercise(v.Name).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = Exercise(v.Id, v.Name).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

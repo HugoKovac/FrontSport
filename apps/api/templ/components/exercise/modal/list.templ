@@ -13,7 +13,7 @@ templ List(exercises []*domain.Exercise){
         </thead>
         <tbody>
             for _, v := range exercises {
-                @Exercise(v.Name)
+                @Exercise(v.Id, v.Name)
             }
         </tbody>
     </table>

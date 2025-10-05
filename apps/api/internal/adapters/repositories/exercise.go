@@ -2,6 +2,7 @@ package repositories
 
 import (
 	"GoNext/base/ent"
+	"GoNext/base/ent/exercise"
 	"GoNext/base/internal/core/domain"
 	"GoNext/base/internal/core/ports"
 	"context"
@@ -41,4 +42,13 @@ func (r *ExerciseRepository) GetExercises() ([]*domain.Exercise, error) {
 	}
 	return r.ToDomainExercises(exercises), nil
 
+}
+
+func (r *ExerciseRepository) GetExerciseById(id int) (*domain.Exercise, error) {
+	ctx := context.Background()
+	exercise, err := r.client.Exercise.Query().Where(exercise.ID(id)).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return r.ToDomainExercise(exercise), nil
 }

@@ -1,8 +1,8 @@
 package modal
 
-templ Exercise(name string){
+templ Exercise(id int, name string){
     <tr>
         <td>{name}</td>
-        <td><input type="checkbox" class="checkbox checkbox-success" /></td>
+        <td><input type="checkbox" class="checkbox checkbox-success" value={id} id={id} name="exercise" /></td>
     </tr>
 }

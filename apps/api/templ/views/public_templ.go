@@ -45,7 +45,7 @@ func PublicHome() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<h1>Public Home</h1>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"hero bg-base-200 min-h-screen\"><div class=\"hero-content text-center\"><div class=\"max-w-md\"><h1 class=\"text-5xl font-bold\">Front Sport</h1><p class=\"py-6\"><h2 class=\"text-3xl\">Log. Program. Progress.</h2><br><i>(soon enhanced by AI)</i></p><br><a href=\"/auth/register\" class=\"btn btn-primary\">Get Started</a></div></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

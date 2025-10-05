@@ -11,10 +11,11 @@ type UserService interface {
 }
 
 type AuthService interface {
-    Authenticate(username string, password string) (string, error)
-    ValidateToken(tokenString string) (string, error)
+	Authenticate(username string, password string) (string, error)
+	ValidateToken(tokenString string) (string, error)
 }
 
 type ExerciseService interface {
 	GetExercises() ([]*domain.Exercise, error)
+	GetExerciseById(id int) (*domain.Exercise, error)
 }

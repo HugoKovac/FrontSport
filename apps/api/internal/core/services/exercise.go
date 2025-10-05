@@ -18,3 +18,8 @@ func NewExerciseService(exerciseRepo ports.ExerciseRepository) ports.ExerciseSer
 func (s *ExerciseService) GetExercises() ([]*domain.Exercise, error) {
 	return s.ExerciseRepository.GetExercises()
 }
+
+
+func (s *ExerciseService) GetExerciseById(id int) (*domain.Exercise, error){
+	return s.ExerciseRepository.GetExerciseById(id)
+}

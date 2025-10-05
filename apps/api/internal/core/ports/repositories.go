@@ -14,4 +14,5 @@ type UserRepository interface {
 
 type ExerciseRepository interface {
 	GetExercises() ([]*domain.Exercise, error)
+	GetExerciseById(id int) (*domain.Exercise, error)
 }

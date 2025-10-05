@@ -24,7 +24,7 @@ func New(c *Config) {
 }
 
 func registerPublicRoute(s fiber.Router, h *ExerciseHandler) {
-	s.Post("/add-exercise", h.AddExercise)
-	s.Post("/add", h.AddSet)
+	s.Post("/add-set", h.AddSet)
+	s.Post("/add", h.AddExercise)
 	s.Get("/", h.GetExercises)
 }
