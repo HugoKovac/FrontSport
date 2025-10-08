@@ -86,6 +86,10 @@ func init() {
 	workout.DefaultUpdatedAt = workoutDescUpdatedAt.Default.(func() time.Time)
 	// workout.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	workout.UpdateDefaultUpdatedAt = workoutDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// workoutDescActive is the schema descriptor for active field.
+	workoutDescActive := workoutFields[2].Descriptor()
+	// workout.DefaultActive holds the default value on creation for the active field.
+	workout.DefaultActive = workoutDescActive.Default.(bool)
 	// workoutDescID is the schema descriptor for id field.
 	workoutDescID := workoutFields[0].Descriptor()
 	// workout.DefaultID holds the default value on creation for the id field.

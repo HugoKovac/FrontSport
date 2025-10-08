@@ -1,42 +1,36 @@
 package workout
 
 import (
-	"GoNext/base/ent"
-	"GoNext/base/internal/adapters/dto"
+	"GoNext/base/pkg/fiber/fibercontext"
 	"GoNext/base/pkg/templ"
-	customvalidator "GoNext/base/pkg/validator"
 	"GoNext/base/templ/components"
+	"GoNext/base/templ/components/exercise"
 	"GoNext/base/templ/views"
 
-	"github.com/go-playground/validator/v10"
+	t "github.com/a-h/templ"
 	"github.com/gofiber/fiber/v2"
 	"github.com/google/uuid"
 )
 
-func (h *WorkoutHandler) GetWorkout(c *fiber.Ctx) error {
-	var query dto.WorkoutQuery
-	err := c.ParamsParser(&query)
+func (h *WorkoutHandler) GetWorkout(c *fiber.Ctx) (err error) {
+	wrk := fibercontext.GetWorkoutToContext(c)
+	wrk.WorkoutExercises, err = h.WorkoutExerciseService.GetWorkoutExerciseByWorkoutId(uuid.MustParse(wrk.Id))
 	if err != nil {
-		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))
+		return templ.Render(c, components.Toast(components.ToastAttributes{T: "error", Message: "Failed getting workout exercise"}))
 	}
-	if err := h.Validate.Struct(query); err != nil {
-		if errs, ok := err.(validator.ValidationErrors); ok {
-			c.Status(fiber.StatusUnprocessableEntity)
-			return templ.Render(c, components.ErrorMessage(customvalidator.ErrorMessage(errs)))
+	var exercises []t.Component
+	for _, v := range wrk.WorkoutExercises {
+		if v.Exercise == nil {
+			continue
 		}
+		exercise := exercise.Card(-1, v.Exercise.Name, exercise.Set(exercise.SetAttributes{
+			Index:          1,
+			PreviousWeight: 60,
+			PreviousReps:   12,
+		}))
+
+		exercises = append(exercises, exercise)
 	}
-	if query.WorkoutID == uuid.Nil {
-		c.Set("HX-Redirect", "/error/not-found")
-		return nil
-	}
-	wrk, err := h.WorkoutService.GetWorkoutById(query.WorkoutID)
-	if ent.IsNotFound(err) {
-		c.Set("HX-Redirect", "/error/not-found")
-		return nil
-	}
-	if err != nil {
-		c.Status(500)
-		return templ.Render(c, components.ErrorMessage([]string{"Internal Server Error"}))
-	}
-	return templ.Render(c, views.Workout(wrk.CreatedAt.String()))
+
+	return templ.Render(c, views.Workout(wrk.Id, exercises...))
 }

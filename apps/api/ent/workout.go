@@ -23,11 +23,16 @@ type Workout struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// Name holds the value of the "name" field.
+	Name string `json:"name,omitempty"`
+	// Active holds the value of the "active" field.
+	Active bool `json:"active,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID uuid.UUID `json:"user_id,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the WorkoutQuery when eager-loading is set.
-	Edges         WorkoutEdges `json:"edges"`
-	user_workouts *uuid.UUID
-	selectValues  sql.SelectValues
+	Edges        WorkoutEdges `json:"edges"`
+	selectValues sql.SelectValues
 }
 
 // WorkoutEdges holds the relations/edges for other nodes in the graph.
@@ -66,12 +71,14 @@ func (*Workout) scanValues(columns []string) ([]any, error) {
 	values := make([]any, len(columns))
 	for i := range columns {
 		switch columns[i] {
+		case workout.FieldActive:
+			values[i] = new(sql.NullBool)
+		case workout.FieldName:
+			values[i] = new(sql.NullString)
 		case workout.FieldCreatedAt, workout.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case workout.FieldID:
+		case workout.FieldID, workout.FieldUserID:
 			values[i] = new(uuid.UUID)
-		case workout.ForeignKeys[0]: // user_workouts
-			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			values[i] = new(sql.UnknownType)
 		}
@@ -105,12 +112,23 @@ func (w *Workout) assignValues(columns []string, values []any) error {
 			} else if value.Valid {
 				w.UpdatedAt = value.Time
 			}
-		case workout.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullScanner); !ok {
-				return fmt.Errorf("unexpected type %T for field user_workouts", values[i])
+		case workout.FieldName:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field name", values[i])
 			} else if value.Valid {
-				w.user_workouts = new(uuid.UUID)
-				*w.user_workouts = *value.S.(*uuid.UUID)
+				w.Name = value.String
+			}
+		case workout.FieldActive:
+			if value, ok := values[i].(*sql.NullBool); !ok {
+				return fmt.Errorf("unexpected type %T for field active", values[i])
+			} else if value.Valid {
+				w.Active = value.Bool
+			}
+		case workout.FieldUserID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value != nil {
+				w.UserID = *value
 			}
 		default:
 			w.selectValues.Set(columns[i], values[i])
@@ -163,6 +181,15 @@ func (w *Workout) String() string {
 	builder.WriteString(", ")
 	builder.WriteString("updated_at=")
 	builder.WriteString(w.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", ")
+	builder.WriteString("name=")
+	builder.WriteString(w.Name)
+	builder.WriteString(", ")
+	builder.WriteString("active=")
+	builder.WriteString(fmt.Sprintf("%v", w.Active))
+	builder.WriteString(", ")
+	builder.WriteString("user_id=")
+	builder.WriteString(fmt.Sprintf("%v", w.UserID))
 	builder.WriteByte(')')
 	return builder.String()
 }

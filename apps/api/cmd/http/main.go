@@ -6,9 +6,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"GoNext/base/cmd/http/srvinit"
 	"GoNext/base/ent"
-	"GoNext/base/internal/adapters/handlers"
-	"GoNext/base/internal/adapters/repositories"
 	"GoNext/base/pkg/config"
 	"GoNext/base/pkg/database"
 
@@ -29,9 +28,8 @@ func main() {
 	}
 	defer entClient.Close()
 
-	userRepo := repositories.NewUserRepository(entClient)
-	exerciseRepo := repositories.NewExerciseRepository(entClient)
-	workoutRepo := repositories.NewWorkoutRepository(entClient)
+	repos := srvinit.InitRepos(entClient)
+	services := srvinit.InitServices(repos, config)
 
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
@@ -41,7 +39,7 @@ func main() {
 		AllowCredentials: true,
 	}))
 
-	handlers.InitHandlers(app, userRepo, exerciseRepo, workoutRepo, config)
+	srvinit.InitHandlers(app, services, config)
 
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)

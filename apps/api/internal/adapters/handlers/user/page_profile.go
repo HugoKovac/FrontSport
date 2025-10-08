@@ -1,6 +1,7 @@
 package user
 
 import (
+	"GoNext/base/pkg/fiber/fibercontext"
 	"GoNext/base/pkg/templ"
 	"GoNext/base/templ/views/user"
 
@@ -8,14 +9,14 @@ import (
 )
 
 func (h *UserHandler) UserProfilePage(c *fiber.Ctx) error {
-	u := c.Locals("userID")
+	u := fibercontext.GetUserToContext(c)
 
-	if u == nil {
+	if u.Id == "" {
 		c.Set("HX-Redirect", "/auth/register")
 		return nil
 	}
 
-	use, err := h.UserService.GetById(u.(string))
+	use, err := h.UserService.GetById(u.Id)
 	if err != nil {
 		c.Set("HX-Redirect", "/auth/register")
 		return nil

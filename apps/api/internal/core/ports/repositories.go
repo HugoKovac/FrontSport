@@ -22,5 +22,12 @@ type ExerciseRepository interface {
 type WorkoutRepository interface {
 	CreateWorkout(userId uuid.UUID) (*domain.Workout, error)
 	GetWorkoutsByUser(userId uuid.UUID) ([]*domain.Workout, error)
+	GetActiveWorkoutByUser(userId uuid.UUID) (*domain.Workout, error)
 	GetWorkoutById(id uuid.UUID) (*domain.Workout, error)
+	UpdateWorkoutToNotActive(id uuid.UUID) error
+}
+
+type WorkoutExerciseRepository interface {
+	CreateWorkoutExercise(exerciseId int, userId uuid.UUID) (*domain.WorkoutExercise, error)
+	GetWorkoutExerciseByWorkoutId(id uuid.UUID) ([]*domain.WorkoutExercise, error)
 }

@@ -37,6 +37,60 @@ func (wu *WorkoutUpdate) SetUpdatedAt(t time.Time) *WorkoutUpdate {
 	return wu
 }
 
+// SetName sets the "name" field.
+func (wu *WorkoutUpdate) SetName(s string) *WorkoutUpdate {
+	wu.mutation.SetName(s)
+	return wu
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (wu *WorkoutUpdate) SetNillableName(s *string) *WorkoutUpdate {
+	if s != nil {
+		wu.SetName(*s)
+	}
+	return wu
+}
+
+// ClearName clears the value of the "name" field.
+func (wu *WorkoutUpdate) ClearName() *WorkoutUpdate {
+	wu.mutation.ClearName()
+	return wu
+}
+
+// SetActive sets the "active" field.
+func (wu *WorkoutUpdate) SetActive(b bool) *WorkoutUpdate {
+	wu.mutation.SetActive(b)
+	return wu
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (wu *WorkoutUpdate) SetNillableActive(b *bool) *WorkoutUpdate {
+	if b != nil {
+		wu.SetActive(*b)
+	}
+	return wu
+}
+
+// SetUserID sets the "user_id" field.
+func (wu *WorkoutUpdate) SetUserID(u uuid.UUID) *WorkoutUpdate {
+	wu.mutation.SetUserID(u)
+	return wu
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (wu *WorkoutUpdate) SetNillableUserID(u *uuid.UUID) *WorkoutUpdate {
+	if u != nil {
+		wu.SetUserID(*u)
+	}
+	return wu
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (wu *WorkoutUpdate) ClearUserID() *WorkoutUpdate {
+	wu.mutation.ClearUserID()
+	return wu
+}
+
 // AddWorkoutExerciseIDs adds the "workout_exercise" edge to the WorkoutExercise entity by IDs.
 func (wu *WorkoutUpdate) AddWorkoutExerciseIDs(ids ...int) *WorkoutUpdate {
 	wu.mutation.AddWorkoutExerciseIDs(ids...)
@@ -50,20 +104,6 @@ func (wu *WorkoutUpdate) AddWorkoutExercise(w ...*WorkoutExercise) *WorkoutUpdat
 		ids[i] = w[i].ID
 	}
 	return wu.AddWorkoutExerciseIDs(ids...)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (wu *WorkoutUpdate) SetUserID(id uuid.UUID) *WorkoutUpdate {
-	wu.mutation.SetUserID(id)
-	return wu
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (wu *WorkoutUpdate) SetNillableUserID(id *uuid.UUID) *WorkoutUpdate {
-	if id != nil {
-		wu = wu.SetUserID(*id)
-	}
-	return wu
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -150,6 +190,15 @@ func (wu *WorkoutUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := wu.mutation.UpdatedAt(); ok {
 		_spec.SetField(workout.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := wu.mutation.Name(); ok {
+		_spec.SetField(workout.FieldName, field.TypeString, value)
+	}
+	if wu.mutation.NameCleared() {
+		_spec.ClearField(workout.FieldName, field.TypeString)
+	}
+	if value, ok := wu.mutation.Active(); ok {
+		_spec.SetField(workout.FieldActive, field.TypeBool, value)
 	}
 	if wu.mutation.WorkoutExerciseCleared() {
 		edge := &sqlgraph.EdgeSpec{
@@ -251,6 +300,60 @@ func (wuo *WorkoutUpdateOne) SetUpdatedAt(t time.Time) *WorkoutUpdateOne {
 	return wuo
 }
 
+// SetName sets the "name" field.
+func (wuo *WorkoutUpdateOne) SetName(s string) *WorkoutUpdateOne {
+	wuo.mutation.SetName(s)
+	return wuo
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (wuo *WorkoutUpdateOne) SetNillableName(s *string) *WorkoutUpdateOne {
+	if s != nil {
+		wuo.SetName(*s)
+	}
+	return wuo
+}
+
+// ClearName clears the value of the "name" field.
+func (wuo *WorkoutUpdateOne) ClearName() *WorkoutUpdateOne {
+	wuo.mutation.ClearName()
+	return wuo
+}
+
+// SetActive sets the "active" field.
+func (wuo *WorkoutUpdateOne) SetActive(b bool) *WorkoutUpdateOne {
+	wuo.mutation.SetActive(b)
+	return wuo
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (wuo *WorkoutUpdateOne) SetNillableActive(b *bool) *WorkoutUpdateOne {
+	if b != nil {
+		wuo.SetActive(*b)
+	}
+	return wuo
+}
+
+// SetUserID sets the "user_id" field.
+func (wuo *WorkoutUpdateOne) SetUserID(u uuid.UUID) *WorkoutUpdateOne {
+	wuo.mutation.SetUserID(u)
+	return wuo
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (wuo *WorkoutUpdateOne) SetNillableUserID(u *uuid.UUID) *WorkoutUpdateOne {
+	if u != nil {
+		wuo.SetUserID(*u)
+	}
+	return wuo
+}
+
+// ClearUserID clears the value of the "user_id" field.
+func (wuo *WorkoutUpdateOne) ClearUserID() *WorkoutUpdateOne {
+	wuo.mutation.ClearUserID()
+	return wuo
+}
+
 // AddWorkoutExerciseIDs adds the "workout_exercise" edge to the WorkoutExercise entity by IDs.
 func (wuo *WorkoutUpdateOne) AddWorkoutExerciseIDs(ids ...int) *WorkoutUpdateOne {
 	wuo.mutation.AddWorkoutExerciseIDs(ids...)
@@ -264,20 +367,6 @@ func (wuo *WorkoutUpdateOne) AddWorkoutExercise(w ...*WorkoutExercise) *WorkoutU
 		ids[i] = w[i].ID
 	}
 	return wuo.AddWorkoutExerciseIDs(ids...)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (wuo *WorkoutUpdateOne) SetUserID(id uuid.UUID) *WorkoutUpdateOne {
-	wuo.mutation.SetUserID(id)
-	return wuo
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (wuo *WorkoutUpdateOne) SetNillableUserID(id *uuid.UUID) *WorkoutUpdateOne {
-	if id != nil {
-		wuo = wuo.SetUserID(*id)
-	}
-	return wuo
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -394,6 +483,15 @@ func (wuo *WorkoutUpdateOne) sqlSave(ctx context.Context) (_node *Workout, err e
 	}
 	if value, ok := wuo.mutation.UpdatedAt(); ok {
 		_spec.SetField(workout.FieldUpdatedAt, field.TypeTime, value)
+	}
+	if value, ok := wuo.mutation.Name(); ok {
+		_spec.SetField(workout.FieldName, field.TypeString, value)
+	}
+	if wuo.mutation.NameCleared() {
+		_spec.ClearField(workout.FieldName, field.TypeString)
+	}
+	if value, ok := wuo.mutation.Active(); ok {
+		_spec.SetField(workout.FieldActive, field.TypeBool, value)
 	}
 	if wuo.mutation.WorkoutExerciseCleared() {
 		edge := &sqlgraph.EdgeSpec{

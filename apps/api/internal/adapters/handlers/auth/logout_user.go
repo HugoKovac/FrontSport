@@ -25,6 +25,6 @@ func (h *AuthHandler) Logout(c *fiber.Ctx) error {
 		Path:     "/",
 	}
 	c.Cookie(&cookie)
-	c.Set("HX-Refresh", "true")
+	c.Set("HX-Redirect", "/")
 	return nil
 }

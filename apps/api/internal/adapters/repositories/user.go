@@ -22,23 +22,6 @@ func NewUserRepository(client *ent.Client) ports.UserRepository {
 	}
 }
 
-func (r *UserRepository) toDomainUser(entUser *ent.User) *domain.User {
-	if entUser == nil {
-		return nil
-	}
-
-	return &domain.User{
-		Id:        entUser.ID.String(),
-		Firstname: entUser.Firstname,
-		Lastname:  entUser.Lastname,
-		Email:     entUser.Email,
-		Password:  entUser.Password,
-		CreatedAt: entUser.CreatedAt,
-		UpdatedAt: entUser.CreatedAt,
-		Role:      entUser.Role.String(),
-	}
-}
-
 func (r *UserRepository) Create(user domain.User) (*domain.User, error) {
 	ctx := context.Background()
 	dUser, err := r.client.User.Create().
@@ -55,7 +38,7 @@ func (r *UserRepository) Create(user domain.User) (*domain.User, error) {
 		return nil, err
 	}
 
-	return r.toDomainUser(dUser), nil
+	return dUser.ToDomain(), nil
 }
 
 func (r *UserRepository) FindById(id string) (*domain.User, error) {
@@ -66,13 +49,13 @@ func (r *UserRepository) FindById(id string) (*domain.User, error) {
 		return nil, err
 	}
 	u, err := r.client.User.Query().Where(user.ID(uuid)).Only(ctx)
-	return r.toDomainUser(u), err
+	return u.ToDomain(), err
 }
 
 func (r *UserRepository) FindByEmail(email string) (*domain.User, error) {
 	ctx := context.Background()
 	u, err := r.client.User.Query().Where(user.Email(email)).Only(ctx)
-	return r.toDomainUser(u), err
+	return u.ToDomain(), err
 }
 
 func (r *UserRepository) Update(user *domain.User) error {

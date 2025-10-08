@@ -1,14 +1,13 @@
-package handlers
+package srvinit
 
 import (
-	"GoNext/base/cmd/http/srvinit"
 	"GoNext/base/internal/adapters/handlers/auth"
 	error_handler "GoNext/base/internal/adapters/handlers/error"
 	"GoNext/base/internal/adapters/handlers/exercise"
-	"GoNext/base/internal/adapters/handlers/middleware"
 	"GoNext/base/internal/adapters/handlers/public"
 	"GoNext/base/internal/adapters/handlers/user"
 	"GoNext/base/internal/adapters/handlers/workout"
+	"GoNext/base/internal/adapters/handlers/middleware"
 	"GoNext/base/pkg/config"
 	customvalidator "GoNext/base/pkg/validator"
 
@@ -16,7 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func InitHandlers(app *fiber.App, services srvinit.Services, config *config.Config) {
+func InitHandlers(app *fiber.App, services *Services, config *config.Config) {
 
 	v := validator.New()
 	customvalidator.RegisterCustomValidators(v)
@@ -46,6 +45,7 @@ func InitHandlers(app *fiber.App, services srvinit.Services, config *config.Conf
 		R:              global.Group("/workout"),
 		Validate:       v,
 		WorkoutService: services.Workout,
+		WorkoutExerciseService: services.WorkoutExercise,
 	})
 	exercise.New(&exercise.Config{
 		R:                      global.Group("/exercise"),

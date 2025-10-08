@@ -51,6 +51,48 @@ func (wc *WorkoutCreate) SetNillableUpdatedAt(t *time.Time) *WorkoutCreate {
 	return wc
 }
 
+// SetName sets the "name" field.
+func (wc *WorkoutCreate) SetName(s string) *WorkoutCreate {
+	wc.mutation.SetName(s)
+	return wc
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (wc *WorkoutCreate) SetNillableName(s *string) *WorkoutCreate {
+	if s != nil {
+		wc.SetName(*s)
+	}
+	return wc
+}
+
+// SetActive sets the "active" field.
+func (wc *WorkoutCreate) SetActive(b bool) *WorkoutCreate {
+	wc.mutation.SetActive(b)
+	return wc
+}
+
+// SetNillableActive sets the "active" field if the given value is not nil.
+func (wc *WorkoutCreate) SetNillableActive(b *bool) *WorkoutCreate {
+	if b != nil {
+		wc.SetActive(*b)
+	}
+	return wc
+}
+
+// SetUserID sets the "user_id" field.
+func (wc *WorkoutCreate) SetUserID(u uuid.UUID) *WorkoutCreate {
+	wc.mutation.SetUserID(u)
+	return wc
+}
+
+// SetNillableUserID sets the "user_id" field if the given value is not nil.
+func (wc *WorkoutCreate) SetNillableUserID(u *uuid.UUID) *WorkoutCreate {
+	if u != nil {
+		wc.SetUserID(*u)
+	}
+	return wc
+}
+
 // SetID sets the "id" field.
 func (wc *WorkoutCreate) SetID(u uuid.UUID) *WorkoutCreate {
 	wc.mutation.SetID(u)
@@ -78,20 +120,6 @@ func (wc *WorkoutCreate) AddWorkoutExercise(w ...*WorkoutExercise) *WorkoutCreat
 		ids[i] = w[i].ID
 	}
 	return wc.AddWorkoutExerciseIDs(ids...)
-}
-
-// SetUserID sets the "user" edge to the User entity by ID.
-func (wc *WorkoutCreate) SetUserID(id uuid.UUID) *WorkoutCreate {
-	wc.mutation.SetUserID(id)
-	return wc
-}
-
-// SetNillableUserID sets the "user" edge to the User entity by ID if the given value is not nil.
-func (wc *WorkoutCreate) SetNillableUserID(id *uuid.UUID) *WorkoutCreate {
-	if id != nil {
-		wc = wc.SetUserID(*id)
-	}
-	return wc
 }
 
 // SetUser sets the "user" edge to the User entity.
@@ -142,6 +170,10 @@ func (wc *WorkoutCreate) defaults() {
 		v := workout.DefaultUpdatedAt()
 		wc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := wc.mutation.Active(); !ok {
+		v := workout.DefaultActive
+		wc.mutation.SetActive(v)
+	}
 	if _, ok := wc.mutation.ID(); !ok {
 		v := workout.DefaultID()
 		wc.mutation.SetID(v)
@@ -155,6 +187,9 @@ func (wc *WorkoutCreate) check() error {
 	}
 	if _, ok := wc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Workout.updated_at"`)}
+	}
+	if _, ok := wc.mutation.Active(); !ok {
+		return &ValidationError{Name: "active", err: errors.New(`ent: missing required field "Workout.active"`)}
 	}
 	return nil
 }
@@ -199,6 +234,14 @@ func (wc *WorkoutCreate) createSpec() (*Workout, *sqlgraph.CreateSpec) {
 		_spec.SetField(workout.FieldUpdatedAt, field.TypeTime, value)
 		_node.UpdatedAt = value
 	}
+	if value, ok := wc.mutation.Name(); ok {
+		_spec.SetField(workout.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
+	if value, ok := wc.mutation.Active(); ok {
+		_spec.SetField(workout.FieldActive, field.TypeBool, value)
+		_node.Active = value
+	}
 	if nodes := wc.mutation.WorkoutExerciseIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2M,
@@ -229,7 +272,7 @@ func (wc *WorkoutCreate) createSpec() (*Workout, *sqlgraph.CreateSpec) {
 		for _, k := range nodes {
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
-		_node.user_workouts = &nodes[0]
+		_node.UserID = nodes[0]
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

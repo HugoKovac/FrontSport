@@ -28,3 +28,11 @@ func (s *WorkoutService) GetWorkoutsByUser(userId uuid.UUID) ([]*domain.Workout,
 func (s *WorkoutService) GetWorkoutById(id uuid.UUID) (*domain.Workout, error) {
 	return s.WorkoutRepository.GetWorkoutById(id)
 }
+
+func (s *WorkoutService) GetActiveWorkoutByUser(userId uuid.UUID) (*domain.Workout, error) {
+	return s.WorkoutRepository.GetActiveWorkoutByUser(userId)
+}
+
+func (s *WorkoutService) UpdateWorkoutToNotActive(id uuid.UUID) error {
+	return s.WorkoutRepository.UpdateWorkoutToNotActive(id)
+}

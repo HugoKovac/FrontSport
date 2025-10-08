@@ -1,6 +1,7 @@
 package user
 
 import (
+	"GoNext/base/pkg/fiber/fibercontext"
 	"GoNext/base/pkg/templ"
 	customvalidator "GoNext/base/pkg/validator"
 	"GoNext/base/templ/components"
@@ -11,7 +12,7 @@ import (
 )
 
 func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
-	userID := c.Locals("userID").(string)
+	u := fibercontext.GetUserToContext(c)
 
 	var userUpdate struct {
 		Email       string `json:"email" validate:"email"`
@@ -36,7 +37,7 @@ func (h *UserHandler) UpdateUser(c *fiber.Ctx) error {
 		}
 	}
 
-	_, err := h.UserService.Update(userID, userUpdate.Email, userUpdate.OldPassword, userUpdate.NewPassword)
+	_, err := h.UserService.Update(u.Id, userUpdate.Email, userUpdate.OldPassword, userUpdate.NewPassword)
 	if err != nil {
 		c.Status(fiber.StatusUnprocessableEntity)
 		return templ.Render(c, components.ErrorMessage([]string{err.Error()}))

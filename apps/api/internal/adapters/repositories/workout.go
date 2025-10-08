@@ -21,44 +21,33 @@ func NewWorkoutRepository(client *ent.Client) ports.WorkoutRepository {
 	}
 }
 
-func (r *WorkoutRepository) ToDomainWorkout(entWorkout *ent.Workout) *domain.Workout {
-	return &domain.Workout{
-		Id:        entWorkout.ID.String(),
-		CreatedAt: entWorkout.CreatedAt,
-		UpdatedAt: entWorkout.UpdatedAt,
-	}
-}
-
-func (r *WorkoutRepository) ToDomainWorkouts(entWorkouts []*ent.Workout) (exs []*domain.Workout) {
-	for _, v := range entWorkouts {
-		exs = append(exs, r.ToDomainWorkout(v))
-	}
-	return
-}
-
 func (r *WorkoutRepository) CreateWorkout(userId uuid.UUID) (*domain.Workout, error) {
 	ctx := context.Background()
 	wrk, err := r.client.Workout.
 		Create().
 		SetUserID(userId).
+		SetActive(true).
 		Save(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return r.ToDomainWorkout(wrk), nil
+	return wrk.ToDomain(), nil
 }
 
 func (r *WorkoutRepository) GetWorkoutsByUser(userId uuid.UUID) ([]*domain.Workout, error) {
 	ctx := context.Background()
-	workouts, err := r.client.Workout.Query().
+	rtn, err := r.client.Workout.Query().
 		Where(
 			workout.HasUserWith(user.ID(userId)),
 		).
+		Order(ent.Desc(workout.FieldCreatedAt)).
+		WithWorkoutExercise(func(weq *ent.WorkoutExerciseQuery) { weq.WithExercise() }).
 		All(ctx)
 	if err != nil {
 		return nil, err
 	}
-	return r.ToDomainWorkouts(workouts), nil
+	var workouts ent.Workouts = rtn
+	return workouts.ToDomain(), nil
 }
 
 func (r *WorkoutRepository) GetWorkoutById(id uuid.UUID) (*domain.Workout, error) {
@@ -67,5 +56,29 @@ func (r *WorkoutRepository) GetWorkoutById(id uuid.UUID) (*domain.Workout, error
 	if err != nil {
 		return nil, err
 	}
-	return r.ToDomainWorkout(workout), nil
+	return workout.ToDomain(), nil
+}
+
+func (r *WorkoutRepository) GetActiveWorkoutByUser(userId uuid.UUID) (*domain.Workout, error) {
+	ctx := context.Background()
+	workout, err := r.client.Workout.Query().
+		Where(
+			workout.And(
+				workout.HasUserWith(
+					user.ID(userId),
+				),
+				workout.ActiveEQ(true),
+			),
+		).Only(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return workout.ToDomain(), nil
+}
+
+func (r *WorkoutRepository) UpdateWorkoutToNotActive(id uuid.UUID) error {
+	ctx := context.Background()
+	return r.client.Workout.UpdateOneID(id).
+		SetActive(false).
+		Exec(ctx)
 }

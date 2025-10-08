@@ -3,6 +3,7 @@
 package migrate
 
 import (
+	"entgo.io/ent/dialect/entsql"
 	"entgo.io/ent/dialect/sql/schema"
 	"entgo.io/ent/schema/field"
 )
@@ -45,7 +46,9 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "user_workouts", Type: field.TypeUUID, Nullable: true},
+		{Name: "name", Type: field.TypeString, Nullable: true},
+		{Name: "active", Type: field.TypeBool, Default: false},
+		{Name: "user_id", Type: field.TypeUUID, Nullable: true},
 	}
 	// WorkoutsTable holds the schema information for the "workouts" table.
 	WorkoutsTable = &schema.Table{
@@ -55,9 +58,19 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:     "workouts_users_workouts",
-				Columns:    []*schema.Column{WorkoutsColumns[3]},
+				Columns:    []*schema.Column{WorkoutsColumns[5]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "workout_user_id_active",
+				Unique:  true,
+				Columns: []*schema.Column{WorkoutsColumns[5], WorkoutsColumns[4]},
+				Annotation: &entsql.IndexAnnotation{
+					Where: "active = true",
+				},
 			},
 		},
 	}

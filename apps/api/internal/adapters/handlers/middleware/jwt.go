@@ -1,10 +1,11 @@
-// internal/middleware/jwt_middleware.go
 package middleware
 
 import (
 	"strings"
 
+	"GoNext/base/internal/core/domain"
 	"GoNext/base/internal/core/ports"
+	"GoNext/base/pkg/fiber/fibercontext"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -18,7 +19,9 @@ func JWTAuthentication(authService ports.AuthService) fiber.Handler {
 				userID, err := authService.ValidateToken(token)
 				if err == nil {
 					// Set user ID in context for use in protected routes
-					c.Locals("userID", userID)
+					fibercontext.SetUserToContext(c, &domain.User{
+						Id: userID,
+					})
 					return c.Next()
 				}
 			}
@@ -28,7 +31,7 @@ func JWTAuthentication(authService ports.AuthService) fiber.Handler {
 			c.Set("HX-Redirect", "/auth/register")
 			return c.Next()
 		} else {
-			c.Locals("userID", "")
+			fibercontext.SetUserToContext(c, &domain.User{})
 			return c.Next()
 		}
 	}

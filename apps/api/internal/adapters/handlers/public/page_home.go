@@ -1,6 +1,7 @@
 package public
 
 import (
+	"GoNext/base/pkg/fiber/fibercontext"
 	"GoNext/base/pkg/templ"
 	"GoNext/base/templ/views"
 
@@ -9,9 +10,9 @@ import (
 )
 
 func (h *PublicHandler) HomePage(c *fiber.Ctx) error {
-	userID := c.Locals("userID")
-	if userID != nil {
-		user, err := h.UserService.GetById(userID.(string))
+	user := fibercontext.GetUserToContext(c)
+	if user != nil {
+		user, err := h.UserService.GetById(user.Id)
 		if err == nil {
 			wrks, err := h.WorkoutService.GetWorkoutsByUser(uuid.MustParse(user.Id))
 			if err == nil {
@@ -20,5 +21,4 @@ func (h *PublicHandler) HomePage(c *fiber.Ctx) error {
 		}
 	}
 	return templ.Render(c, views.PublicHome())
-
 }
