@@ -8,6 +8,7 @@ import (
 	"GoNext/base/pkg/fiber/fibercontext"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func JWTAuthentication(authService ports.AuthService) fiber.Handler {
@@ -20,7 +21,7 @@ func JWTAuthentication(authService ports.AuthService) fiber.Handler {
 				if err == nil {
 					// Set user ID in context for use in protected routes
 					fibercontext.SetUserToContext(c, &domain.User{
-						Id: userID,
+						Id: uuid.MustParse(userID),
 					})
 					return c.Next()
 				}

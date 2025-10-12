@@ -8,6 +8,7 @@ import (
 	"GoNext/base/ent/user"
 	"GoNext/base/ent/workout"
 	"GoNext/base/ent/workoutexercise"
+	"GoNext/base/ent/workoutexerciseset"
 	"GoNext/base/internal/primitive/userprimitive"
 	"context"
 	"errors"
@@ -29,10 +30,11 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeExercise        = "Exercise"
-	TypeUser            = "User"
-	TypeWorkout         = "Workout"
-	TypeWorkoutExercise = "WorkoutExercise"
+	TypeExercise           = "Exercise"
+	TypeUser               = "User"
+	TypeWorkout            = "Workout"
+	TypeWorkoutExercise    = "WorkoutExercise"
+	TypeWorkoutExerciseSet = "WorkoutExerciseSet"
 )
 
 // ExerciseMutation represents an operation that mutates the Exercise nodes in the graph.
@@ -2240,6 +2242,9 @@ type WorkoutExerciseMutation struct {
 	clearedworkout  bool
 	exercise        *int
 	clearedexercise bool
+	sets            map[uuid.UUID]struct{}
+	removedsets     map[uuid.UUID]struct{}
+	clearedsets     bool
 	done            bool
 	oldValue        func(context.Context) (*WorkoutExercise, error)
 	predicates      []predicate.WorkoutExercise
@@ -2469,6 +2474,60 @@ func (m *WorkoutExerciseMutation) ResetExercise() {
 	m.clearedexercise = false
 }
 
+// AddSetIDs adds the "sets" edge to the WorkoutExerciseSet entity by ids.
+func (m *WorkoutExerciseMutation) AddSetIDs(ids ...uuid.UUID) {
+	if m.sets == nil {
+		m.sets = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		m.sets[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSets clears the "sets" edge to the WorkoutExerciseSet entity.
+func (m *WorkoutExerciseMutation) ClearSets() {
+	m.clearedsets = true
+}
+
+// SetsCleared reports if the "sets" edge to the WorkoutExerciseSet entity was cleared.
+func (m *WorkoutExerciseMutation) SetsCleared() bool {
+	return m.clearedsets
+}
+
+// RemoveSetIDs removes the "sets" edge to the WorkoutExerciseSet entity by IDs.
+func (m *WorkoutExerciseMutation) RemoveSetIDs(ids ...uuid.UUID) {
+	if m.removedsets == nil {
+		m.removedsets = make(map[uuid.UUID]struct{})
+	}
+	for i := range ids {
+		delete(m.sets, ids[i])
+		m.removedsets[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSets returns the removed IDs of the "sets" edge to the WorkoutExerciseSet entity.
+func (m *WorkoutExerciseMutation) RemovedSetsIDs() (ids []uuid.UUID) {
+	for id := range m.removedsets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SetsIDs returns the "sets" edge IDs in the mutation.
+func (m *WorkoutExerciseMutation) SetsIDs() (ids []uuid.UUID) {
+	for id := range m.sets {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSets resets all changes to the "sets" edge.
+func (m *WorkoutExerciseMutation) ResetSets() {
+	m.sets = nil
+	m.clearedsets = false
+	m.removedsets = nil
+}
+
 // Where appends a list predicates to the WorkoutExerciseMutation builder.
 func (m *WorkoutExerciseMutation) Where(ps ...predicate.WorkoutExercise) {
 	m.predicates = append(m.predicates, ps...)
@@ -2622,12 +2681,15 @@ func (m *WorkoutExerciseMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *WorkoutExerciseMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.workout != nil {
 		edges = append(edges, workoutexercise.EdgeWorkout)
 	}
 	if m.exercise != nil {
 		edges = append(edges, workoutexercise.EdgeExercise)
+	}
+	if m.sets != nil {
+		edges = append(edges, workoutexercise.EdgeSets)
 	}
 	return edges
 }
@@ -2644,30 +2706,50 @@ func (m *WorkoutExerciseMutation) AddedIDs(name string) []ent.Value {
 		if id := m.exercise; id != nil {
 			return []ent.Value{*id}
 		}
+	case workoutexercise.EdgeSets:
+		ids := make([]ent.Value, 0, len(m.sets))
+		for id := range m.sets {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *WorkoutExerciseMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
+	if m.removedsets != nil {
+		edges = append(edges, workoutexercise.EdgeSets)
+	}
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
 func (m *WorkoutExerciseMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case workoutexercise.EdgeSets:
+		ids := make([]ent.Value, 0, len(m.removedsets))
+		for id := range m.removedsets {
+			ids = append(ids, id)
+		}
+		return ids
+	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *WorkoutExerciseMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedworkout {
 		edges = append(edges, workoutexercise.EdgeWorkout)
 	}
 	if m.clearedexercise {
 		edges = append(edges, workoutexercise.EdgeExercise)
+	}
+	if m.clearedsets {
+		edges = append(edges, workoutexercise.EdgeSets)
 	}
 	return edges
 }
@@ -2680,6 +2762,8 @@ func (m *WorkoutExerciseMutation) EdgeCleared(name string) bool {
 		return m.clearedworkout
 	case workoutexercise.EdgeExercise:
 		return m.clearedexercise
+	case workoutexercise.EdgeSets:
+		return m.clearedsets
 	}
 	return false
 }
@@ -2708,6 +2792,639 @@ func (m *WorkoutExerciseMutation) ResetEdge(name string) error {
 	case workoutexercise.EdgeExercise:
 		m.ResetExercise()
 		return nil
+	case workoutexercise.EdgeSets:
+		m.ResetSets()
+		return nil
 	}
 	return fmt.Errorf("unknown WorkoutExercise edge %s", name)
+}
+
+// WorkoutExerciseSetMutation represents an operation that mutates the WorkoutExerciseSet nodes in the graph.
+type WorkoutExerciseSetMutation struct {
+	config
+	op                      Op
+	typ                     string
+	id                      *uuid.UUID
+	created_at              *time.Time
+	updated_at              *time.Time
+	weight                  *int
+	addweight               *int
+	reps                    *int
+	addreps                 *int
+	clearedFields           map[string]struct{}
+	workout_exercise        *int
+	clearedworkout_exercise bool
+	done                    bool
+	oldValue                func(context.Context) (*WorkoutExerciseSet, error)
+	predicates              []predicate.WorkoutExerciseSet
+}
+
+var _ ent.Mutation = (*WorkoutExerciseSetMutation)(nil)
+
+// workoutexercisesetOption allows management of the mutation configuration using functional options.
+type workoutexercisesetOption func(*WorkoutExerciseSetMutation)
+
+// newWorkoutExerciseSetMutation creates new mutation for the WorkoutExerciseSet entity.
+func newWorkoutExerciseSetMutation(c config, op Op, opts ...workoutexercisesetOption) *WorkoutExerciseSetMutation {
+	m := &WorkoutExerciseSetMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeWorkoutExerciseSet,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withWorkoutExerciseSetID sets the ID field of the mutation.
+func withWorkoutExerciseSetID(id uuid.UUID) workoutexercisesetOption {
+	return func(m *WorkoutExerciseSetMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *WorkoutExerciseSet
+		)
+		m.oldValue = func(ctx context.Context) (*WorkoutExerciseSet, error) {
+			once.Do(func() {
+				if m.done {
+					err = errors.New("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().WorkoutExerciseSet.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withWorkoutExerciseSet sets the old WorkoutExerciseSet of the mutation.
+func withWorkoutExerciseSet(node *WorkoutExerciseSet) workoutexercisesetOption {
+	return func(m *WorkoutExerciseSetMutation) {
+		m.oldValue = func(context.Context) (*WorkoutExerciseSet, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m WorkoutExerciseSetMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m WorkoutExerciseSetMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, errors.New("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of WorkoutExerciseSet entities.
+func (m *WorkoutExerciseSetMutation) SetID(id uuid.UUID) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID is only available
+// if it was provided to the builder or after it was returned from the database.
+func (m *WorkoutExerciseSetMutation) ID() (id uuid.UUID, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// IDs queries the database and returns the entity ids that match the mutation's predicate.
+// That means, if the mutation is applied within a transaction with an isolation level such
+// as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
+// or updated by the mutation.
+func (m *WorkoutExerciseSetMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	switch {
+	case m.op.Is(OpUpdateOne | OpDeleteOne):
+		id, exists := m.ID()
+		if exists {
+			return []uuid.UUID{id}, nil
+		}
+		fallthrough
+	case m.op.Is(OpUpdate | OpDelete):
+		return m.Client().WorkoutExerciseSet.Query().Where(m.predicates...).IDs(ctx)
+	default:
+		return nil, fmt.Errorf("IDs is not allowed on %s operations", m.op)
+	}
+}
+
+// SetCreatedAt sets the "created_at" field.
+func (m *WorkoutExerciseSetMutation) SetCreatedAt(t time.Time) {
+	m.created_at = &t
+}
+
+// CreatedAt returns the value of the "created_at" field in the mutation.
+func (m *WorkoutExerciseSetMutation) CreatedAt() (r time.Time, exists bool) {
+	v := m.created_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCreatedAt returns the old "created_at" field's value of the WorkoutExerciseSet entity.
+// If the WorkoutExerciseSet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkoutExerciseSetMutation) OldCreatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldCreatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldCreatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCreatedAt: %w", err)
+	}
+	return oldValue.CreatedAt, nil
+}
+
+// ResetCreatedAt resets all changes to the "created_at" field.
+func (m *WorkoutExerciseSetMutation) ResetCreatedAt() {
+	m.created_at = nil
+}
+
+// SetUpdatedAt sets the "updated_at" field.
+func (m *WorkoutExerciseSetMutation) SetUpdatedAt(t time.Time) {
+	m.updated_at = &t
+}
+
+// UpdatedAt returns the value of the "updated_at" field in the mutation.
+func (m *WorkoutExerciseSetMutation) UpdatedAt() (r time.Time, exists bool) {
+	v := m.updated_at
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUpdatedAt returns the old "updated_at" field's value of the WorkoutExerciseSet entity.
+// If the WorkoutExerciseSet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkoutExerciseSetMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUpdatedAt is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUpdatedAt requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUpdatedAt: %w", err)
+	}
+	return oldValue.UpdatedAt, nil
+}
+
+// ResetUpdatedAt resets all changes to the "updated_at" field.
+func (m *WorkoutExerciseSetMutation) ResetUpdatedAt() {
+	m.updated_at = nil
+}
+
+// SetWeight sets the "weight" field.
+func (m *WorkoutExerciseSetMutation) SetWeight(i int) {
+	m.weight = &i
+	m.addweight = nil
+}
+
+// Weight returns the value of the "weight" field in the mutation.
+func (m *WorkoutExerciseSetMutation) Weight() (r int, exists bool) {
+	v := m.weight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldWeight returns the old "weight" field's value of the WorkoutExerciseSet entity.
+// If the WorkoutExerciseSet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkoutExerciseSetMutation) OldWeight(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldWeight is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldWeight requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldWeight: %w", err)
+	}
+	return oldValue.Weight, nil
+}
+
+// AddWeight adds i to the "weight" field.
+func (m *WorkoutExerciseSetMutation) AddWeight(i int) {
+	if m.addweight != nil {
+		*m.addweight += i
+	} else {
+		m.addweight = &i
+	}
+}
+
+// AddedWeight returns the value that was added to the "weight" field in this mutation.
+func (m *WorkoutExerciseSetMutation) AddedWeight() (r int, exists bool) {
+	v := m.addweight
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetWeight resets all changes to the "weight" field.
+func (m *WorkoutExerciseSetMutation) ResetWeight() {
+	m.weight = nil
+	m.addweight = nil
+}
+
+// SetReps sets the "reps" field.
+func (m *WorkoutExerciseSetMutation) SetReps(i int) {
+	m.reps = &i
+	m.addreps = nil
+}
+
+// Reps returns the value of the "reps" field in the mutation.
+func (m *WorkoutExerciseSetMutation) Reps() (r int, exists bool) {
+	v := m.reps
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldReps returns the old "reps" field's value of the WorkoutExerciseSet entity.
+// If the WorkoutExerciseSet object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *WorkoutExerciseSetMutation) OldReps(ctx context.Context) (v int, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldReps is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldReps requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldReps: %w", err)
+	}
+	return oldValue.Reps, nil
+}
+
+// AddReps adds i to the "reps" field.
+func (m *WorkoutExerciseSetMutation) AddReps(i int) {
+	if m.addreps != nil {
+		*m.addreps += i
+	} else {
+		m.addreps = &i
+	}
+}
+
+// AddedReps returns the value that was added to the "reps" field in this mutation.
+func (m *WorkoutExerciseSetMutation) AddedReps() (r int, exists bool) {
+	v := m.addreps
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// ResetReps resets all changes to the "reps" field.
+func (m *WorkoutExerciseSetMutation) ResetReps() {
+	m.reps = nil
+	m.addreps = nil
+}
+
+// SetWorkoutExerciseID sets the "workout_exercise" edge to the WorkoutExercise entity by id.
+func (m *WorkoutExerciseSetMutation) SetWorkoutExerciseID(id int) {
+	m.workout_exercise = &id
+}
+
+// ClearWorkoutExercise clears the "workout_exercise" edge to the WorkoutExercise entity.
+func (m *WorkoutExerciseSetMutation) ClearWorkoutExercise() {
+	m.clearedworkout_exercise = true
+}
+
+// WorkoutExerciseCleared reports if the "workout_exercise" edge to the WorkoutExercise entity was cleared.
+func (m *WorkoutExerciseSetMutation) WorkoutExerciseCleared() bool {
+	return m.clearedworkout_exercise
+}
+
+// WorkoutExerciseID returns the "workout_exercise" edge ID in the mutation.
+func (m *WorkoutExerciseSetMutation) WorkoutExerciseID() (id int, exists bool) {
+	if m.workout_exercise != nil {
+		return *m.workout_exercise, true
+	}
+	return
+}
+
+// WorkoutExerciseIDs returns the "workout_exercise" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// WorkoutExerciseID instead. It exists only for internal usage by the builders.
+func (m *WorkoutExerciseSetMutation) WorkoutExerciseIDs() (ids []int) {
+	if id := m.workout_exercise; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetWorkoutExercise resets all changes to the "workout_exercise" edge.
+func (m *WorkoutExerciseSetMutation) ResetWorkoutExercise() {
+	m.workout_exercise = nil
+	m.clearedworkout_exercise = false
+}
+
+// Where appends a list predicates to the WorkoutExerciseSetMutation builder.
+func (m *WorkoutExerciseSetMutation) Where(ps ...predicate.WorkoutExerciseSet) {
+	m.predicates = append(m.predicates, ps...)
+}
+
+// WhereP appends storage-level predicates to the WorkoutExerciseSetMutation builder. Using this method,
+// users can use type-assertion to append predicates that do not depend on any generated package.
+func (m *WorkoutExerciseSetMutation) WhereP(ps ...func(*sql.Selector)) {
+	p := make([]predicate.WorkoutExerciseSet, len(ps))
+	for i := range ps {
+		p[i] = ps[i]
+	}
+	m.Where(p...)
+}
+
+// Op returns the operation name.
+func (m *WorkoutExerciseSetMutation) Op() Op {
+	return m.op
+}
+
+// SetOp allows setting the mutation operation.
+func (m *WorkoutExerciseSetMutation) SetOp(op Op) {
+	m.op = op
+}
+
+// Type returns the node type of this mutation (WorkoutExerciseSet).
+func (m *WorkoutExerciseSetMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *WorkoutExerciseSetMutation) Fields() []string {
+	fields := make([]string, 0, 4)
+	if m.created_at != nil {
+		fields = append(fields, workoutexerciseset.FieldCreatedAt)
+	}
+	if m.updated_at != nil {
+		fields = append(fields, workoutexerciseset.FieldUpdatedAt)
+	}
+	if m.weight != nil {
+		fields = append(fields, workoutexerciseset.FieldWeight)
+	}
+	if m.reps != nil {
+		fields = append(fields, workoutexerciseset.FieldReps)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *WorkoutExerciseSetMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case workoutexerciseset.FieldCreatedAt:
+		return m.CreatedAt()
+	case workoutexerciseset.FieldUpdatedAt:
+		return m.UpdatedAt()
+	case workoutexerciseset.FieldWeight:
+		return m.Weight()
+	case workoutexerciseset.FieldReps:
+		return m.Reps()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *WorkoutExerciseSetMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case workoutexerciseset.FieldCreatedAt:
+		return m.OldCreatedAt(ctx)
+	case workoutexerciseset.FieldUpdatedAt:
+		return m.OldUpdatedAt(ctx)
+	case workoutexerciseset.FieldWeight:
+		return m.OldWeight(ctx)
+	case workoutexerciseset.FieldReps:
+		return m.OldReps(ctx)
+	}
+	return nil, fmt.Errorf("unknown WorkoutExerciseSet field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WorkoutExerciseSetMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case workoutexerciseset.FieldCreatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCreatedAt(v)
+		return nil
+	case workoutexerciseset.FieldUpdatedAt:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUpdatedAt(v)
+		return nil
+	case workoutexerciseset.FieldWeight:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetWeight(v)
+		return nil
+	case workoutexerciseset.FieldReps:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetReps(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WorkoutExerciseSet field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *WorkoutExerciseSetMutation) AddedFields() []string {
+	var fields []string
+	if m.addweight != nil {
+		fields = append(fields, workoutexerciseset.FieldWeight)
+	}
+	if m.addreps != nil {
+		fields = append(fields, workoutexerciseset.FieldReps)
+	}
+	return fields
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *WorkoutExerciseSetMutation) AddedField(name string) (ent.Value, bool) {
+	switch name {
+	case workoutexerciseset.FieldWeight:
+		return m.AddedWeight()
+	case workoutexerciseset.FieldReps:
+		return m.AddedReps()
+	}
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *WorkoutExerciseSetMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	case workoutexerciseset.FieldWeight:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddWeight(v)
+		return nil
+	case workoutexerciseset.FieldReps:
+		v, ok := value.(int)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.AddReps(v)
+		return nil
+	}
+	return fmt.Errorf("unknown WorkoutExerciseSet numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *WorkoutExerciseSetMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *WorkoutExerciseSetMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *WorkoutExerciseSetMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown WorkoutExerciseSet nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *WorkoutExerciseSetMutation) ResetField(name string) error {
+	switch name {
+	case workoutexerciseset.FieldCreatedAt:
+		m.ResetCreatedAt()
+		return nil
+	case workoutexerciseset.FieldUpdatedAt:
+		m.ResetUpdatedAt()
+		return nil
+	case workoutexerciseset.FieldWeight:
+		m.ResetWeight()
+		return nil
+	case workoutexerciseset.FieldReps:
+		m.ResetReps()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkoutExerciseSet field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *WorkoutExerciseSetMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.workout_exercise != nil {
+		edges = append(edges, workoutexerciseset.EdgeWorkoutExercise)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *WorkoutExerciseSetMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case workoutexerciseset.EdgeWorkoutExercise:
+		if id := m.workout_exercise; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *WorkoutExerciseSetMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *WorkoutExerciseSetMutation) RemovedIDs(name string) []ent.Value {
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *WorkoutExerciseSetMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedworkout_exercise {
+		edges = append(edges, workoutexerciseset.EdgeWorkoutExercise)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *WorkoutExerciseSetMutation) EdgeCleared(name string) bool {
+	switch name {
+	case workoutexerciseset.EdgeWorkoutExercise:
+		return m.clearedworkout_exercise
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *WorkoutExerciseSetMutation) ClearEdge(name string) error {
+	switch name {
+	case workoutexerciseset.EdgeWorkoutExercise:
+		m.ClearWorkoutExercise()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkoutExerciseSet unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *WorkoutExerciseSetMutation) ResetEdge(name string) error {
+	switch name {
+	case workoutexerciseset.EdgeWorkoutExercise:
+		m.ResetWorkoutExercise()
+		return nil
+	}
+	return fmt.Errorf("unknown WorkoutExerciseSet edge %s", name)
 }

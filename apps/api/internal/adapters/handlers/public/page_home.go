@@ -6,7 +6,6 @@ import (
 	"GoNext/base/templ/views"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func (h *PublicHandler) HomePage(c *fiber.Ctx) error {
@@ -14,7 +13,7 @@ func (h *PublicHandler) HomePage(c *fiber.Ctx) error {
 	if user != nil {
 		user, err := h.UserService.GetById(user.Id)
 		if err == nil {
-			wrks, err := h.WorkoutService.GetWorkoutsByUser(uuid.MustParse(user.Id))
+			wrks, err := h.WorkoutService.GetWorkoutsByUser(user.Id)
 			if err == nil {
 				return templ.Render(c, views.ProtectedHome(user.Firstname, wrks))
 			}

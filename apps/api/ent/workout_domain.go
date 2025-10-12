@@ -4,7 +4,7 @@ import "GoNext/base/internal/core/domain"
 
 func (r *Workout) ToDomain() (w *domain.Workout) {
 	w = &domain.Workout{
-		Id:        r.ID.String(),
+		Id:        r.ID,
 		CreatedAt: r.CreatedAt,
 		UpdatedAt: r.UpdatedAt,
 		Active:    r.Active,

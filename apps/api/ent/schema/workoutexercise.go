@@ -33,5 +33,6 @@ func (WorkoutExercise) Edges() []ent.Edge {
 			Ref("workout_exercise").
 			Unique().
 			Required(),
+		edge.To("sets", WorkoutExerciseSet.Type),
 	}
 }

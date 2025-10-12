@@ -2,7 +2,7 @@ package exercise
 
 import "fmt"
 
-templ Card(id int, name string, sets ...templ.Component){
+templ Card(id int, name string, active bool, sets ...templ.Component){
 <div class="flex flex-col items-center">
     <div
         class="flex flex-col overflow-x-auto rounded-box border border-base-content/5 mx-5 bg-base-100 md:max-w-3/4 items-center">
@@ -17,8 +17,10 @@ templ Card(id int, name string, sets ...templ.Component){
             }
             { children... }
         </table>
-        <button class="btn btn-active my-2.5" hx-post="/exercise/add-set" hx-swap="beforeend" hx-target={"#" + tableId}>Add
-            Set</button>
+        if active{
+            <button class="btn btn-active my-2.5" hx-post={fmt.Sprintf("/exercise/add/%d", id)} hx-swap="beforeend" hx-target={"#" + tableId}>Add
+                Set</button>
+        }
     </div>
 </div>
 }

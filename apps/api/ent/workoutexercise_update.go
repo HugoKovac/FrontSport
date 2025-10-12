@@ -7,6 +7,7 @@ import (
 	"GoNext/base/ent/predicate"
 	"GoNext/base/ent/workout"
 	"GoNext/base/ent/workoutexercise"
+	"GoNext/base/ent/workoutexerciseset"
 	"context"
 	"errors"
 	"fmt"
@@ -68,6 +69,21 @@ func (weu *WorkoutExerciseUpdate) SetExercise(e *Exercise) *WorkoutExerciseUpdat
 	return weu.SetExerciseID(e.ID)
 }
 
+// AddSetIDs adds the "sets" edge to the WorkoutExerciseSet entity by IDs.
+func (weu *WorkoutExerciseUpdate) AddSetIDs(ids ...uuid.UUID) *WorkoutExerciseUpdate {
+	weu.mutation.AddSetIDs(ids...)
+	return weu
+}
+
+// AddSets adds the "sets" edges to the WorkoutExerciseSet entity.
+func (weu *WorkoutExerciseUpdate) AddSets(w ...*WorkoutExerciseSet) *WorkoutExerciseUpdate {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return weu.AddSetIDs(ids...)
+}
+
 // Mutation returns the WorkoutExerciseMutation object of the builder.
 func (weu *WorkoutExerciseUpdate) Mutation() *WorkoutExerciseMutation {
 	return weu.mutation
@@ -83,6 +99,27 @@ func (weu *WorkoutExerciseUpdate) ClearWorkout() *WorkoutExerciseUpdate {
 func (weu *WorkoutExerciseUpdate) ClearExercise() *WorkoutExerciseUpdate {
 	weu.mutation.ClearExercise()
 	return weu
+}
+
+// ClearSets clears all "sets" edges to the WorkoutExerciseSet entity.
+func (weu *WorkoutExerciseUpdate) ClearSets() *WorkoutExerciseUpdate {
+	weu.mutation.ClearSets()
+	return weu
+}
+
+// RemoveSetIDs removes the "sets" edge to WorkoutExerciseSet entities by IDs.
+func (weu *WorkoutExerciseUpdate) RemoveSetIDs(ids ...uuid.UUID) *WorkoutExerciseUpdate {
+	weu.mutation.RemoveSetIDs(ids...)
+	return weu
+}
+
+// RemoveSets removes "sets" edges to WorkoutExerciseSet entities.
+func (weu *WorkoutExerciseUpdate) RemoveSets(w ...*WorkoutExerciseSet) *WorkoutExerciseUpdate {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return weu.RemoveSetIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -193,6 +230,51 @@ func (weu *WorkoutExerciseUpdate) sqlSave(ctx context.Context) (n int, err error
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if weu.mutation.SetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := weu.mutation.RemovedSetsIDs(); len(nodes) > 0 && !weu.mutation.SetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := weu.mutation.SetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, weu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{workoutexercise.Label}
@@ -251,6 +333,21 @@ func (weuo *WorkoutExerciseUpdateOne) SetExercise(e *Exercise) *WorkoutExerciseU
 	return weuo.SetExerciseID(e.ID)
 }
 
+// AddSetIDs adds the "sets" edge to the WorkoutExerciseSet entity by IDs.
+func (weuo *WorkoutExerciseUpdateOne) AddSetIDs(ids ...uuid.UUID) *WorkoutExerciseUpdateOne {
+	weuo.mutation.AddSetIDs(ids...)
+	return weuo
+}
+
+// AddSets adds the "sets" edges to the WorkoutExerciseSet entity.
+func (weuo *WorkoutExerciseUpdateOne) AddSets(w ...*WorkoutExerciseSet) *WorkoutExerciseUpdateOne {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return weuo.AddSetIDs(ids...)
+}
+
 // Mutation returns the WorkoutExerciseMutation object of the builder.
 func (weuo *WorkoutExerciseUpdateOne) Mutation() *WorkoutExerciseMutation {
 	return weuo.mutation
@@ -266,6 +363,27 @@ func (weuo *WorkoutExerciseUpdateOne) ClearWorkout() *WorkoutExerciseUpdateOne {
 func (weuo *WorkoutExerciseUpdateOne) ClearExercise() *WorkoutExerciseUpdateOne {
 	weuo.mutation.ClearExercise()
 	return weuo
+}
+
+// ClearSets clears all "sets" edges to the WorkoutExerciseSet entity.
+func (weuo *WorkoutExerciseUpdateOne) ClearSets() *WorkoutExerciseUpdateOne {
+	weuo.mutation.ClearSets()
+	return weuo
+}
+
+// RemoveSetIDs removes the "sets" edge to WorkoutExerciseSet entities by IDs.
+func (weuo *WorkoutExerciseUpdateOne) RemoveSetIDs(ids ...uuid.UUID) *WorkoutExerciseUpdateOne {
+	weuo.mutation.RemoveSetIDs(ids...)
+	return weuo
+}
+
+// RemoveSets removes "sets" edges to WorkoutExerciseSet entities.
+func (weuo *WorkoutExerciseUpdateOne) RemoveSets(w ...*WorkoutExerciseSet) *WorkoutExerciseUpdateOne {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return weuo.RemoveSetIDs(ids...)
 }
 
 // Where appends a list predicates to the WorkoutExerciseUpdate builder.
@@ -399,6 +517,51 @@ func (weuo *WorkoutExerciseUpdateOne) sqlSave(ctx context.Context) (_node *Worko
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: sqlgraph.NewFieldSpec(exercise.FieldID, field.TypeInt),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if weuo.mutation.SetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := weuo.mutation.RemovedSetsIDs(); len(nodes) > 0 && !weuo.mutation.SetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := weuo.mutation.SetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
 			},
 		}
 		for _, k := range nodes {

@@ -6,6 +6,7 @@ import (
 	"GoNext/base/ent/exercise"
 	"GoNext/base/ent/workout"
 	"GoNext/base/ent/workoutexercise"
+	"GoNext/base/ent/workoutexerciseset"
 	"context"
 	"errors"
 	"fmt"
@@ -50,6 +51,21 @@ func (wec *WorkoutExerciseCreate) SetWorkout(w *Workout) *WorkoutExerciseCreate 
 // SetExercise sets the "exercise" edge to the Exercise entity.
 func (wec *WorkoutExerciseCreate) SetExercise(e *Exercise) *WorkoutExerciseCreate {
 	return wec.SetExerciseID(e.ID)
+}
+
+// AddSetIDs adds the "sets" edge to the WorkoutExerciseSet entity by IDs.
+func (wec *WorkoutExerciseCreate) AddSetIDs(ids ...uuid.UUID) *WorkoutExerciseCreate {
+	wec.mutation.AddSetIDs(ids...)
+	return wec
+}
+
+// AddSets adds the "sets" edges to the WorkoutExerciseSet entity.
+func (wec *WorkoutExerciseCreate) AddSets(w ...*WorkoutExerciseSet) *WorkoutExerciseCreate {
+	ids := make([]uuid.UUID, len(w))
+	for i := range w {
+		ids[i] = w[i].ID
+	}
+	return wec.AddSetIDs(ids...)
 }
 
 // Mutation returns the WorkoutExerciseMutation object of the builder.
@@ -165,6 +181,22 @@ func (wec *WorkoutExerciseCreate) createSpec() (*WorkoutExercise, *sqlgraph.Crea
 			edge.Target.Nodes = append(edge.Target.Nodes, k)
 		}
 		_node.ExerciseID = nodes[0]
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := wec.mutation.SetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   workoutexercise.SetsTable,
+			Columns: []string{workoutexercise.SetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: sqlgraph.NewFieldSpec(workoutexerciseset.FieldID, field.TypeUUID),
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec

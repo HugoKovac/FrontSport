@@ -8,7 +8,7 @@ func (r *User) ToDomain() *domain.User {
 	}
 
 	return &domain.User{
-		Id:        r.ID.String(),
+		Id:        r.ID,
 		Firstname: r.Firstname,
 		Lastname:  r.Lastname,
 		Email:     r.Email,

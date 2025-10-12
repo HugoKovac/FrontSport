@@ -8,6 +8,7 @@ import (
 	"GoNext/base/ent/user"
 	"GoNext/base/ent/workout"
 	"GoNext/base/ent/workoutexercise"
+	"GoNext/base/ent/workoutexerciseset"
 	"time"
 
 	"github.com/google/uuid"
@@ -100,4 +101,31 @@ func init() {
 	workoutexerciseDescWorkoutID := workoutexerciseFields[1].Descriptor()
 	// workoutexercise.DefaultWorkoutID holds the default value on creation for the workout_id field.
 	workoutexercise.DefaultWorkoutID = workoutexerciseDescWorkoutID.Default.(func() uuid.UUID)
+	workoutexercisesetMixin := schema.WorkoutExerciseSet{}.Mixin()
+	workoutexercisesetMixinFields0 := workoutexercisesetMixin[0].Fields()
+	_ = workoutexercisesetMixinFields0
+	workoutexercisesetFields := schema.WorkoutExerciseSet{}.Fields()
+	_ = workoutexercisesetFields
+	// workoutexercisesetDescCreatedAt is the schema descriptor for created_at field.
+	workoutexercisesetDescCreatedAt := workoutexercisesetMixinFields0[0].Descriptor()
+	// workoutexerciseset.DefaultCreatedAt holds the default value on creation for the created_at field.
+	workoutexerciseset.DefaultCreatedAt = workoutexercisesetDescCreatedAt.Default.(func() time.Time)
+	// workoutexercisesetDescUpdatedAt is the schema descriptor for updated_at field.
+	workoutexercisesetDescUpdatedAt := workoutexercisesetMixinFields0[1].Descriptor()
+	// workoutexerciseset.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	workoutexerciseset.DefaultUpdatedAt = workoutexercisesetDescUpdatedAt.Default.(func() time.Time)
+	// workoutexerciseset.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	workoutexerciseset.UpdateDefaultUpdatedAt = workoutexercisesetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// workoutexercisesetDescWeight is the schema descriptor for weight field.
+	workoutexercisesetDescWeight := workoutexercisesetFields[1].Descriptor()
+	// workoutexerciseset.DefaultWeight holds the default value on creation for the weight field.
+	workoutexerciseset.DefaultWeight = workoutexercisesetDescWeight.Default.(int)
+	// workoutexercisesetDescReps is the schema descriptor for reps field.
+	workoutexercisesetDescReps := workoutexercisesetFields[2].Descriptor()
+	// workoutexerciseset.DefaultReps holds the default value on creation for the reps field.
+	workoutexerciseset.DefaultReps = workoutexercisesetDescReps.Default.(int)
+	// workoutexercisesetDescID is the schema descriptor for id field.
+	workoutexercisesetDescID := workoutexercisesetFields[0].Descriptor()
+	// workoutexerciseset.DefaultID holds the default value on creation for the id field.
+	workoutexerciseset.DefaultID = workoutexercisesetDescID.Default.(func() uuid.UUID)
 }

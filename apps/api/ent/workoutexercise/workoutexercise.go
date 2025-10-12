@@ -21,6 +21,8 @@ const (
 	EdgeWorkout = "workout"
 	// EdgeExercise holds the string denoting the exercise edge name in mutations.
 	EdgeExercise = "exercise"
+	// EdgeSets holds the string denoting the sets edge name in mutations.
+	EdgeSets = "sets"
 	// Table holds the table name of the workoutexercise in the database.
 	Table = "workout_exercises"
 	// WorkoutTable is the table that holds the workout relation/edge.
@@ -37,6 +39,13 @@ const (
 	ExerciseInverseTable = "exercises"
 	// ExerciseColumn is the table column denoting the exercise relation/edge.
 	ExerciseColumn = "exercise_id"
+	// SetsTable is the table that holds the sets relation/edge.
+	SetsTable = "workout_exercise_sets"
+	// SetsInverseTable is the table name for the WorkoutExerciseSet entity.
+	// It exists in this package in order to avoid circular dependency with the "workoutexerciseset" package.
+	SetsInverseTable = "workout_exercise_sets"
+	// SetsColumn is the table column denoting the sets relation/edge.
+	SetsColumn = "workout_exercise_sets"
 )
 
 // Columns holds all SQL columns for workoutexercise fields.
@@ -92,6 +101,20 @@ func ByExerciseField(field string, opts ...sql.OrderTermOption) OrderOption {
 		sqlgraph.OrderByNeighborTerms(s, newExerciseStep(), sql.OrderByField(field, opts...))
 	}
 }
+
+// BySetsCount orders the results by sets count.
+func BySetsCount(opts ...sql.OrderTermOption) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborsCount(s, newSetsStep(), opts...)
+	}
+}
+
+// BySets orders the results by sets terms.
+func BySets(term sql.OrderTerm, terms ...sql.OrderTerm) OrderOption {
+	return func(s *sql.Selector) {
+		sqlgraph.OrderByNeighborTerms(s, newSetsStep(), append([]sql.OrderTerm{term}, terms...)...)
+	}
+}
 func newWorkoutStep() *sqlgraph.Step {
 	return sqlgraph.NewStep(
 		sqlgraph.From(Table, FieldID),
@@ -104,5 +127,12 @@ func newExerciseStep() *sqlgraph.Step {
 		sqlgraph.From(Table, FieldID),
 		sqlgraph.To(ExerciseInverseTable, FieldID),
 		sqlgraph.Edge(sqlgraph.M2O, true, ExerciseTable, ExerciseColumn),
+	)
+}
+func newSetsStep() *sqlgraph.Step {
+	return sqlgraph.NewStep(
+		sqlgraph.From(Table, FieldID),
+		sqlgraph.To(SetsInverseTable, FieldID),
+		sqlgraph.Edge(sqlgraph.O2M, false, SetsTable, SetsColumn),
 	)
 }

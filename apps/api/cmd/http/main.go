@@ -34,7 +34,7 @@ func main() {
 	app := fiber.New()
 	app.Use(cors.New(cors.Config{
 		AllowOrigins:     config.Cors.AllowOrigins,
-		AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
+		AllowMethods:     "GET, POST, PATCH, PUT, DELETE, OPTIONS",
 		AllowHeaders:     "Origin, Content-Type, Accept, Authorization, X-Requested-With",
 		AllowCredentials: true,
 	}))

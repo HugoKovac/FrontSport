@@ -6,12 +6,13 @@ import (
 	"GoNext/base/templ/views/user"
 
 	"github.com/gofiber/fiber/v2"
+	"github.com/google/uuid"
 )
 
 func (h *UserHandler) UserProfilePage(c *fiber.Ctx) error {
 	u := fibercontext.GetUserToContext(c)
 
-	if u.Id == "" {
+	if u == nil || u.Id == uuid.Nil {
 		c.Set("HX-Redirect", "/auth/register")
 		return nil
 	}

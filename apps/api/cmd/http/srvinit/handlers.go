@@ -52,6 +52,8 @@ func InitHandlers(app *fiber.App, services *Services, config *config.Config) {
 		ExerciseService:        services.Exercise,
 		WorkoutService:         services.Workout,
 		WorkoutExerciseService: services.WorkoutExercise,
+		WorkoutExerciseSetService: services.WorkoutExerciseSet,
+		Validate:    v,
 	})
 	error_handler.New(&error_handler.Config{
 		R: global.Group("/error"),

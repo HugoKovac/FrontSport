@@ -6,8 +6,8 @@ import (
 	"github.com/gofiber/fiber/v2"
 )
 
-func SetUserToContext(c *fiber.Ctx, workout *domain.User) {
-	c.Locals("user", workout)
+func SetUserToContext(c *fiber.Ctx, user *domain.User) {
+	c.Locals("user", user)
 }
 
 func GetUserToContext(c *fiber.Ctx) *domain.User {

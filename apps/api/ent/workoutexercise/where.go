@@ -151,6 +151,29 @@ func HasExerciseWith(preds ...predicate.Exercise) predicate.WorkoutExercise {
 	})
 }
 
+// HasSets applies the HasEdge predicate on the "sets" edge.
+func HasSets() predicate.WorkoutExercise {
+	return predicate.WorkoutExercise(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, SetsTable, SetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasSetsWith applies the HasEdge predicate on the "sets" edge with a given conditions (other predicates).
+func HasSetsWith(preds ...predicate.WorkoutExerciseSet) predicate.WorkoutExercise {
+	return predicate.WorkoutExercise(func(s *sql.Selector) {
+		step := newSetsStep()
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // And groups predicates with the AND operator between them.
 func And(predicates ...predicate.WorkoutExercise) predicate.WorkoutExercise {
 	return predicate.WorkoutExercise(sql.AndPredicates(predicates...))

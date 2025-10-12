@@ -1,31 +1,34 @@
 package exercise
 
+import (
+"fmt"
+)
+
 type SetAttributes struct {
-    Index int
-    PreviousWeight int
-    PreviousReps int
+WorkoutExerciseId int
+ID string
+PreviousWeight int
+PreviousReps int
+Weight int
+Reps int
 }
 
 templ Set(attr SetAttributes){
-    <tr>
-        <th>{attr.Index}</th>
+<tr>
+    <form>
+        <th></th>
         <td>{attr.PreviousWeight} kg x {attr.PreviousReps}</td>
         <td>
-            <input
-                type="number"
-                class="input validator min-w-24"
-                required
-                placeholder="reps"
-                />
+            <input type="number" class="input validator min-w-24" name="reps" required placeholder="reps"
+                value={attr.Reps} />
         </td>
         <td>
-            <input
-                type="number"
-                class="input validator min-w-24"
-                required
-                placeholder="kg"
-                />
+            <input type="number" class="input validator min-w-24" name="weight" required placeholder="kg"
+                value={attr.Weight} />
         </td>
-        <td><input type="checkbox" class="checkbox checkbox-success" /></td>
-    </tr>
+        <td>
+            <input type="checkbox" class="checkbox checkbox-success" hx-patch={fmt.Sprintf("/exercise/set/%s", attr.ID)} />
+        </td>
+    </form>
+</tr>
 }

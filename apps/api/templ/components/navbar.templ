@@ -1,14 +1,17 @@
 package components
 
+import "GoNext/base/internal/core/domain"
+
 templ NavBar(OOB bool){
 <div id="navbar" hx-swap-oob={OOB}>
     <div class="navbar bg-base-100 shadow-sm">
         <div class="flex-1">
-            <a class="btn btn-ghost text-xl" href="/">FrontSport</a>
+            <a class="btn btn-ghost text-xl" href="/">FrontSport {{ctx.Value("user")}}</a>
         </div>
+        {{auth := ctx.Value("user").(*domain.User) != nil }}
         <div class="flex gap-2">
             <div class="dropdown dropdown-end">
-                if ctx.Value("user") != nil {
+                if auth {
                 <div tabindex="0" role="button" class="btn btn-ghost btn-circle avatar">
                     <svg fill="#FFFFFF" height="20px" width="20px" version="1.1" id="Capa_1"
                         xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -32,7 +35,7 @@ templ NavBar(OOB bool){
                 </div>
                 }
                 <ul tabindex="0" class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
-                    if ctx.Value("user") != nil {
+                    if auth {
                     <li><a href="/users/profile">Profile</a></li>
                     <li><a>Settings</a></li>
                     <li><a hx-post="/auth/logout">Logout</a></li>

@@ -2,10 +2,11 @@ package views
 
 import (
     "GoNext/base/templ/layouts"
+	"github.com/google/uuid"
 	"fmt"
 )
 
-templ Workout(wrkId string, exercises ...templ.Component) {
+templ Workout(wrkId uuid.UUID, active bool, exercises ...templ.Component) {
     @layouts.BaseLayout(){
         <div class="flex flex-col items-center">
             <div id="exercises">
@@ -13,20 +14,22 @@ templ Workout(wrkId string, exercises ...templ.Component) {
                 @exercise
             }
             </div>
-            <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" onclick="my_modal_1.showModal()" hx-target="#modal_content" hx-trigger="click" hx-get="/exercise">Add Exercise</button>
-            <button class="btn btn-error my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" hx-post={fmt.Sprintf("/workout/%s/finish", wrkId)}>Finish</button>
-            <dialog id="my_modal_1" class="modal">
-                <form class="modal-box" hx-post={"/exercise/add/"+wrkId}>
-                    <h3 class="text-lg font-bold">Choose An Exercise</h3>
-                    <div id="modal_content" />
-                    <div class="modal-action">
-                    <form method="dialog">
-                        <button class="btn">Close</button>
-                        <button class="btn" type="submit" hx-target="#exercises" hx-post={"/exercise/add/"+wrkId} hx-swap="beforeend" hx-on::after-request="my_modal_1.close()">Add</button>
+            if active {
+                <button class="btn btn-active my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" onclick="my_modal_1.showModal()" hx-target="#modal_content" hx-trigger="click" hx-get="/exercise">Add Exercise</button>
+                <button class="btn btn-error my-2.5 mx-6 md:max-w-3/4 lg:max-w-1/2" hx-post={fmt.Sprintf("/workout/%s/finish", wrkId)}>Finish</button>
+                <dialog id="my_modal_1" class="modal">
+                    <form class="modal-box" hx-post={"/exercise/add/"+wrkId.String()}>
+                        <h3 class="text-lg font-bold">Choose An Exercise</h3>
+                        <div id="modal_content" />
+                        <div class="modal-action">
+                        <form method="dialog">
+                            <button class="btn">Close</button>
+                            <button class="btn" type="submit" hx-target="#exercises" hx-post={"/exercise/add/"+wrkId.String()} hx-swap="beforeend" hx-on::after-request="my_modal_1.close()">Add</button>
+                        </form>
+                        </div>
                     </form>
-                    </div>
-                </form>
-            </dialog>
+                </dialog>
+            }
         </div>
     }
 }

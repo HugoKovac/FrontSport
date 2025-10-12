@@ -7,6 +7,7 @@ import (
 	"GoNext/base/ent/user"
 	"GoNext/base/ent/workout"
 	"GoNext/base/ent/workoutexercise"
+	"GoNext/base/ent/workoutexerciseset"
 	"context"
 	"errors"
 	"fmt"
@@ -76,10 +77,11 @@ var (
 func checkColumn(table, column string) error {
 	initCheck.Do(func() {
 		columnCheck = sql.NewColumnCheck(map[string]func(string) bool{
-			exercise.Table:        exercise.ValidColumn,
-			user.Table:            user.ValidColumn,
-			workout.Table:         workout.ValidColumn,
-			workoutexercise.Table: workoutexercise.ValidColumn,
+			exercise.Table:           exercise.ValidColumn,
+			user.Table:               user.ValidColumn,
+			workout.Table:            workout.ValidColumn,
+			workoutexercise.Table:    workoutexercise.ValidColumn,
+			workoutexerciseset.Table: workoutexerciseset.ValidColumn,
 		})
 	})
 	return columnCheck(table, column)

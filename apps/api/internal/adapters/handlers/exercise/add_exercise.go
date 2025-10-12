@@ -9,7 +9,6 @@ import (
 	"log"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/google/uuid"
 )
 
 func (h *ExerciseHandler) AddExercise(c *fiber.Ctx) error {
@@ -25,12 +24,13 @@ func (h *ExerciseHandler) AddExercise(c *fiber.Ctx) error {
 			log.Println(err.Error())
 			return templ.Render(c, components.Toast(components.ToastAttributes{T: "error", Message: "Failed creating exercise"}))
 		}
-		if _, err = h.WorkoutExerciseService.CreateWorkoutExercise(exercise.Id, uuid.MustParse(wrk.Id)); err != nil {
+		if _, err = h.WorkoutExerciseService.CreateWorkoutExercise(exercise.Id, wrk.Id); err != nil {
 			log.Println(err.Error())
 			return templ.Render(c, components.Toast(components.ToastAttributes{T: "error", Message: "Failed creating workout exercise"}))
 		}
-		templ.Render(c, exercise_comp.Card(exercise.Id, exercise.Name, exercise_comp.Set(exercise_comp.SetAttributes{
-			Index:          1,
+		// todo: create actual set to return
+		templ.Render(c, exercise_comp.Card(exercise.Id, exercise.Name, wrk.Active, exercise_comp.Set(exercise_comp.SetAttributes{
+			ID:          "1",
 			PreviousWeight: 60,
 			PreviousReps:   12,
 		})))

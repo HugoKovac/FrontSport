@@ -35,9 +35,11 @@ type WorkoutExerciseEdges struct {
 	Workout *Workout `json:"workout,omitempty"`
 	// Exercise holds the value of the exercise edge.
 	Exercise *Exercise `json:"exercise,omitempty"`
+	// Sets holds the value of the sets edge.
+	Sets []*WorkoutExerciseSet `json:"sets,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // WorkoutOrErr returns the Workout value or an error if the edge
@@ -60,6 +62,15 @@ func (e WorkoutExerciseEdges) ExerciseOrErr() (*Exercise, error) {
 		return nil, &NotFoundError{label: exercise.Label}
 	}
 	return nil, &NotLoadedError{edge: "exercise"}
+}
+
+// SetsOrErr returns the Sets value or an error if the edge
+// was not loaded in eager-loading.
+func (e WorkoutExerciseEdges) SetsOrErr() ([]*WorkoutExerciseSet, error) {
+	if e.loadedTypes[2] {
+		return e.Sets, nil
+	}
+	return nil, &NotLoadedError{edge: "sets"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -125,6 +136,11 @@ func (we *WorkoutExercise) QueryWorkout() *WorkoutQuery {
 // QueryExercise queries the "exercise" edge of the WorkoutExercise entity.
 func (we *WorkoutExercise) QueryExercise() *ExerciseQuery {
 	return NewWorkoutExerciseClient(we.config).QueryExercise(we)
+}
+
+// QuerySets queries the "sets" edge of the WorkoutExercise entity.
+func (we *WorkoutExercise) QuerySets() *WorkoutExerciseSetQuery {
+	return NewWorkoutExerciseClient(we.config).QuerySets(we)
 }
 
 // Update returns a builder for updating this WorkoutExercise.
