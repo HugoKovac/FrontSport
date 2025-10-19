@@ -10,13 +10,25 @@ templ BaseLayout() {
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script src="/assets/js/htmx.min.js"></script>
-    <!-- Tailwind CSS (output) -->
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5/themes.css" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    //
-    <link href="/assets/css/output.css" rel="stylesheet" />
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
 </head>
+
+<style>
+    input::-webkit-outer-spin-button,
+    input::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    /* Firefox */
+    input[type=number] {
+        -moz-appearance: textfield;
+    }
+</style>
 
 <body id="root" class="h-full">
     <script>
@@ -39,7 +51,18 @@ templ BaseLayout() {
                 evt.detail.target = htmx.find("#teapot");
             }
         });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[maxlength]').forEach(input => {
+                input.addEventListener('input', e => {
+                    let val = e.target.value, len = +e.target.getAttribute('maxlength');
+                    e.target.value = val.slice(0, len);
+                })
+            })
+        })
     </script>
+
+
     <main id="main" class="h-full flex flex-col">
         @components.NavBar(false)
         { children... }

@@ -18,7 +18,6 @@ func (h *ExerciseHandler) AddSet(c *fiber.Ctx) error {
 		return templ.Render(c, components.Toast(components.ToastAttributes{T: "error", Message: "Failed creating set"}))
 	}
 	return templ.Render(c, exercise.Set(exercise.SetAttributes{
-		WorkoutExerciseId: we.Id,
 		ID:          wes.Id.String(),
 		PreviousWeight: 0,
 		PreviousReps:   0,

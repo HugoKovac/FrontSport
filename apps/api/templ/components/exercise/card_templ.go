@@ -31,7 +31,7 @@ func Card(id int, name string, active bool, sets ...templ.Component) templ.Compo
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col items-center\"><div class=\"flex flex-col overflow-x-auto rounded-box border border-base-content/5 mx-5 bg-base-100 md:max-w-3/4 items-center\"><div class=\"flex justify-between my-2.5 mx-3.5 items-center\"><h1 class=\"self-start font-semibold text-2xl\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col items-center mb-5\"><div class=\"flex flex-col overflow-x-auto rounded-box border border-base-content/5 mx-5 bg-base-100 w-full items-center\"><div class=\"flex justify-between my-2.5 mx-3.5 items-center\"><h1 class=\"self-start font-semibold text-2xl\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -90,9 +90,9 @@ func Card(id int, name string, active bool, sets ...templ.Component) templ.Compo
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
-			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/exercise/add/%d", id))
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("/exercise/set/%d", id))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/exercise/card.templ`, Line: 21, Col: 94}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/exercise/card.templ`, Line: 21, Col: 90}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -105,7 +105,7 @@ func Card(id int, name string, active bool, sets ...templ.Component) templ.Compo
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs("#" + tableId)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/exercise/card.templ`, Line: 21, Col: 140}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `components/exercise/card.templ`, Line: 22, Col: 36}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

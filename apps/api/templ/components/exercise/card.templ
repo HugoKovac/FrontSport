@@ -3,9 +3,9 @@ package exercise
 import "fmt"
 
 templ Card(id int, name string, active bool, sets ...templ.Component){
-<div class="flex flex-col items-center">
+<div class="flex flex-col items-center mb-5">
     <div
-        class="flex flex-col overflow-x-auto rounded-box border border-base-content/5 mx-5 bg-base-100 md:max-w-3/4 items-center">
+        class="flex flex-col overflow-x-auto rounded-box border border-base-content/5 mx-5 bg-base-100 w-full items-center">
         <div class="flex justify-between my-2.5 mx-3.5 items-center">
             <h1 class="self-start font-semibold text-2xl">{name}</h1>
         </div>
@@ -13,13 +13,14 @@ templ Card(id int, name string, active bool, sets ...templ.Component){
         <table class="table" id={tableId}>
             @Header()
             for _, v := range sets{
-                @v
+            @v
             }
             { children... }
         </table>
         if active{
-            <button class="btn btn-active my-2.5" hx-post={fmt.Sprintf("/exercise/add/%d", id)} hx-swap="beforeend" hx-target={"#" + tableId}>Add
-                Set</button>
+        <button class="btn btn-active my-2.5" hx-post={fmt.Sprintf("/exercise/set/%d", id)} hx-swap="beforeend"
+            hx-target={"#" + tableId}>Add
+            Set</button>
         }
     </div>
 </div>
